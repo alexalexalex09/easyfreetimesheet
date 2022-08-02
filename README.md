@@ -9,3 +9,4 @@ A simple way for small business employees to submit hours worked
 * Record hours on previous or future dates
 * Optionally connect to an organization
 * Optionally record clock in and clock out times
+* Optionally allow employees to see remaining hours of various types
