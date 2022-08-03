@@ -1,0 +1,99 @@
+:root {
+  --main-background: #933;
+  --main-font-color: #fff;
+}
+
+body {
+  font: 14px "Quicksand", "Lucida Grande", Helvetica, Arial, sans-serif;
+  color: var(--main-font-color);
+  background-color: var(--main-background);
+}
+
+input[type=time]::-webkit-datetime-edit-ampm-field {
+  display: none;
+}
+
+button {
+  background-color: #0000;
+  border: 2px solid var(--main-font-color);
+  border-radius: 7px;
+  padding: 5px 15px;
+  color: var(--main-font-color);
+  cursor: pointer;
+}
+
+
+/*************************
+*      Main Elements
+**************************/
+
+#main-container {
+  display: grid;
+  justify-content: center;
+  text-align: center;
+  grid-template-rows: repeat(7, 2em);
+  grid-template-columns: repeat(10, 10%);
+  row-gap: 20px;
+  font-size: 2em;
+}
+
+#hoursPrompt {
+  grid-area: 1/1/2/11;
+}
+
+#date {
+  grid-area: 2/1/3/11;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#time {
+  grid-area: 3/1/5/11;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#time div {
+  display: flex;
+  justify-content: space-evenly;
+  font-size: 1em;
+  flex-direction: column;
+}
+
+#time div input, #time div button {
+  align-self: center;
+}
+
+#time div input {
+  width: 2em;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+#hoursTypeContainer {
+  grid-area: 5/1/6/11;
+  max-height: 2em;
+  justify-self: center;
+}
+
+#submitHours {
+  grid-area: 7/1/8/11;
+  justify-self: center;
+  align-self: center;
+  font-size: 1em;
+}
+
+#footer {
+  display: flex;
+  width: calc(100vw - 2em);
+  margin: 0px;
+  padding: 1em;
+  left: 0px;
+  bottom: 0px;
+  position: absolute;
+  justify-content: space-between;
+  font-size: 2em;
+  color: var(--main-background);
+  background: var(--main-font-color);
+}
