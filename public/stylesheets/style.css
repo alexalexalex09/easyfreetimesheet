@@ -16,10 +16,11 @@ input[type=time]::-webkit-datetime-edit-ampm-field {
 button {
   background-color: #0000;
   border: 2px solid var(--main-font-color);
-  border-radius: 7px;
+  border-radius: 12px;
   padding: 5px 15px;
   color: var(--main-font-color);
   cursor: pointer;
+  font-size: 3vw;
 }
 
 
@@ -31,10 +32,13 @@ button {
   display: grid;
   justify-content: center;
   text-align: center;
-  grid-template-rows: repeat(7, 2em);
+  grid-template-rows: repeat(9, 8rem);
   grid-template-columns: repeat(10, 10%);
   row-gap: 20px;
-  font-size: 2em;
+  font-size: 5vw;
+  width: 100%;
+  max-width: 800px;
+  margin: 40px auto;
 }
 
 #hoursPrompt {
@@ -44,8 +48,12 @@ button {
 #date {
   grid-area: 2/1/3/11;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
+}
+
+#dateInput {
+  font-size: 2rem;
 }
 
 #time {
@@ -57,7 +65,7 @@ button {
 #time div {
   display: flex;
   justify-content: space-evenly;
-  font-size: 1em;
+  font-size: 1rem;
   flex-direction: column;
 }
 
@@ -66,34 +74,41 @@ button {
 }
 
 #time div input {
-  width: 2em;
-  font-size: 1.5em;
+  width: 10vw;
+  font-size: 8vw;
   text-align: center;
 }
 
 #hoursTypeContainer {
   grid-area: 5/1/6/11;
-  max-height: 2em;
+  max-height: 2rem;
   justify-self: center;
 }
 
+#hoursType {
+  font-size: 2rem;
+}
+
 #submitHours {
-  grid-area: 7/1/8/11;
+  grid-area: 6/1/7/11;
   justify-self: center;
   align-self: center;
-  font-size: 1em;
+  font-size: 3rem;
+  padding: 10px 40px;
 }
 
 #footer {
   display: flex;
-  width: calc(100vw - 2em);
+  width: 100%;
+  box-sizing: border-box;
   margin: 0px;
-  padding: 1em;
+  padding: 5vmin 8vmin;
   left: 0px;
   bottom: 0px;
-  position: absolute;
+  position: fixed;
   justify-content: space-between;
-  font-size: 2em;
+  font-size: 4vh;
   color: var(--main-background);
   background: var(--main-font-color);
 }
+
