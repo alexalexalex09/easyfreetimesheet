@@ -1,6 +1,8 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = document.querySelectorAll;
 
+//TODO: Add ability to join organization
+
 window.addEventListener("load", function () {
   Date.prototype.toDateInputValue = function () {
     var local = new Date(this);
@@ -23,7 +25,6 @@ function efsFetch(req, body, handler, errorHandler) {
     },
   };
   fetch(req, tts_options).then(function (response) {
-    finishLoader();
     return response.json().then((res) => {
       if (res.err) {
         if (errorHandler) {
@@ -66,7 +67,7 @@ function submitHours() {
     minutes: theMinutes,
     type: theType,
   };
-  efsFetch("/submit", body, function (res) {
+  efsFetch("/api/submit", body, function (res) {
     console.log({ res });
   });
 }
