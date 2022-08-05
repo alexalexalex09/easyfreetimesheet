@@ -23,6 +23,13 @@ button {
   font-size: 3vw;
 }
 
+/*
+div {
+  border: 1px solid white;
+  box-sizing: border-box;
+}
+*/
+
 
 /*************************
 *      Main Elements
@@ -32,7 +39,7 @@ button {
   display: grid;
   justify-content: center;
   text-align: center;
-  grid-template-rows: repeat(9, 8rem);
+  grid-template-rows: repeat(9, 4rem);
   grid-template-columns: repeat(10, 10%);
   row-gap: 20px;
   font-size: 5vw;
@@ -43,6 +50,8 @@ button {
 
 #hoursPrompt {
   grid-area: 1/1/2/11;
+  font-size: 2rem;
+  font-weight: bold;
 }
 
 #date {
@@ -54,6 +63,7 @@ button {
 
 #dateInput {
   font-size: 2rem;
+  max-width: min-content;
 }
 
 #time {
@@ -74,7 +84,7 @@ button {
 }
 
 #time div input {
-  width: 10vw;
+  width: 12vw;
   font-size: 8vw;
   text-align: center;
 }
@@ -86,7 +96,11 @@ button {
 }
 
 #hoursType {
-  font-size: 2rem;
+  font-size: 6vw;
+}
+
+#hoursTypeLabel {
+  font-size: 6vw;
 }
 
 #submitHours {

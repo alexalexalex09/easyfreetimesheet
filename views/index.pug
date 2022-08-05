@@ -4,25 +4,26 @@ block content
   #main-container
     #hoursPrompt Enter your hours
     #date
-      button#yesterday -1 Day
+      button#yesterday(onclick="changeInput('#dateInput', -1)") <<
       input#dateInput(type="date")
-      button#tomorrow +1 Day
+      button#tomorrow(onclick="changeInput('#dateInput', 1)") >>
     #time
       #hours 
-        button#hoursMinus +1
-        input#hoursInput(type="number" value="0")
-        button#hoursPlus -1
+        button#hoursPlus(onclick="changeInput('#hoursInput', 1)") +1
+        input#hoursInput(type="number" value="0" min="0")
+        button#hoursMinus(onclick="changeInput('#hoursInput', -1)") -1
       #minutes
-        button#minutesMinus +15
-        input#minutes(type="number" step="15")
-        button#minutesPlus -15
+        button#minutesPlus(onclick="changeInput('#minutesInput', 15)") +15
+        input#minutesInput(type="number" step="15" value="0" min="0")
+        button#minutesMinus(onclick="changeInput('#minutesInput', -15)") -15
     #hoursTypeContainer
       label#hoursTypeLabel(for="hoursType") Type of hours: 
       select#hoursType(name="hoursType")
         option(value="worked") Worked
         option(value="vacation") Vacation
-    button#submitHours(type="submit") Submit
-    #error.hidden  
+    button#submitHours(type="submit" onclick="submitHours()") Submit
+    #error.hidden
+    #hoursList
   #footer
     i#menuButton(class="fa-solid fa-bars")
     i#historyButton(class="fa-solid fa-clock-rotate-left")
