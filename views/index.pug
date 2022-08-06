@@ -4,9 +4,11 @@ block content
   #main-container
     #hoursPrompt Enter your hours
     #date
-      button#yesterday(onclick="changeInput('#dateInput', -1)") <<
+      button#yesterday(onclick="changeInput('#dateInput', -1)")
+        i.rightArrow.fa-solid.fa-arrow-left-long
       input#dateInput(type="date")
-      button#tomorrow(onclick="changeInput('#dateInput', 1)") >>
+      button#tomorrow(onclick="changeInput('#dateInput', 1)")
+        i.rightArrow.fa-solid.fa-arrow-right-long
     #time
       #hours 
         button#hoursPlus(onclick="changeInput('#hoursInput', 1)") +1
@@ -25,6 +27,41 @@ block content
     #error.hidden
     #hoursList
   #footer
-    i#menuButton(class="fa-solid fa-bars")
-    i#historyButton(class="fa-solid fa-clock-rotate-left")
-    i#calendarViewButton(class="fa-solid fa-calendar")
+    i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
+    i#historyButton.fa-solid.fa-clock-rotate-left
+    i#calendarViewButton.fa-solid.fa-calendar
+  #mainMenu.small
+    #close.clickable.hidden(onclick="toggleMenu()")
+      i.fa-solid.fa-x
+    if user
+      #menuItems.hidden
+        li#userDisplay
+          i.fa-solid.fa-user
+          #username #{user.displayName}
+        li#organizations
+          i(class='fa-solid fa-building-user')
+          #joinNewOrg(onclick="showOrgMenu()") Organizations
+        li#logoutItem(onclick="window.location='/logout'")
+          i(class='fa-solid fa-right-from-bracket')
+          #logout
+            | Logout
+    else
+      #login.clickable.hidden(onclick="window.location='/login'") Login 
+  #orgMenu.hidden
+    #close.clickable(onclick="closeOrgMenu()")
+      i.fa-solid.fa-x
+    #addOrg 
+      label(for="addOrg") Enter code to join a new organization
+      #addOrgInputs 
+        input(type="text" maxlength="5")
+        i#addOrgSubmit.fa-solid.fa-check.clickable(onclick='joinOrg()')
+    #orgList 
+      #orgListTitle Your organizations: 
+      #fetchingOrgs.loading
+      #orgs
+    #createOrgContainer  
+      #showCreateOrg
+        button(onclick="showCreateOrg()") Create a new organization
+      #createOrg
+        input(type="text")
+        button(onclick="createOrg()") Create My Org

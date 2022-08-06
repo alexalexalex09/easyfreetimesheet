@@ -7,6 +7,7 @@ var UserSchema = new Schema(
   {
     firstName: String,
     lastName: String,
+    displayName: String,
     profile_id: String,
     darkMode: Boolean,
     hourLimits: { maxYearly: Number, regularHours: Number, vacation: Number },

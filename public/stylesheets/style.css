@@ -1,12 +1,18 @@
 :root {
   --main-background: #933;
   --main-font-color: #fff;
+  --main-highlight: #fbd5cd;
+  --main-black: #000;
 }
 
 body {
   font: 14px "Quicksand", "Lucida Grande", Helvetica, Arial, sans-serif;
   color: var(--main-font-color);
-  background-color: var(--main-background);
+  background-color: var(--main-background);    
+  background: url(/images/background3.svg);
+  background-size: cover;
+  background-position: center;
+  overflow-x: hidden;
 }
 
 input[type=time]::-webkit-datetime-edit-ampm-field {
@@ -14,14 +20,59 @@ input[type=time]::-webkit-datetime-edit-ampm-field {
 }
 
 button {
-  background-color: #0000;
-  border: 2px solid var(--main-font-color);
+  background-color: #fffc;
+  border: none;
   border-radius: 12px;
   padding: 5px 15px;
-  color: var(--main-font-color);
+  color: var(--main-black);
   cursor: pointer;
   font-size: 3vw;
+  opacity: .8;
+  box-shadow: rgb(50 50 93 / 25%) 0px 13px 27px -5px, rgb(0 0 0 / 30%) 0px 8px 16px -8px;
+  font-family: "Quicksand", sans-serif;
 }
+
+.hidden {
+  display: none !important;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.small {
+  width: 0% !important;
+  height: 0% !important;
+  padding: 0% !important;
+}
+
+.error {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+  color: red;
+}
+
+
+.loading{
+  -webkit-animation:zoom-in-out 2s ease-in-out 0s infinite normal;
+  -moz-animation:zoom-in-out 2s ease-in-out 0s infinite normal;
+  -ms-animation:zoom-in-out 2s ease-in-out 0s infinite normal;
+  animation:zoom-in-out 2s ease-in-out 0s infinite normal;
+  }
+  
+  @-webkit-keyframes zoom-in-out {
+  0%{ -webkit-transform: scale(1); transform: scale(1); }
+  50%{ -webkit-transform: scale(1.2); transform: scale(1.2); }
+  100%{ -webkit-transform: scale(1); transform: scale(1); }
+  }
+  
+  @keyframes zoom-in-out {
+  0%{ -ms-transform: scale(1); transform: scale(1); }
+  50%{ -ms-transform: scale(1.2); transform: scale(1.2); }
+  100%{ -ms-transform: scale(1); transform: scale(1); }
+  }
+  
 
 /*
 div {
@@ -39,7 +90,7 @@ div {
   display: grid;
   justify-content: center;
   text-align: center;
-  grid-template-rows: repeat(9, 4rem);
+  grid-template-rows: repeat(9, 4.5rem);
   grid-template-columns: repeat(10, 10%);
   row-gap: 20px;
   font-size: 5vw;
@@ -52,6 +103,7 @@ div {
   grid-area: 1/1/2/11;
   font-size: 2rem;
   font-weight: bold;
+  text-shadow: 1px 1px 7px #333a;
 }
 
 #date {
@@ -59,11 +111,16 @@ div {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+  box-shadow: rgb(50 50 93 / 25%) 0px 6px 12px -2px, rgb(0 0 0 / 30%) 0px 3px 7px -3px;
+  border-radius: 20px;
+  background-color: var(--main-highlight);
 }
 
 #dateInput {
   font-size: 2rem;
   max-width: min-content;
+  font-family: "Quicksand", serif;
+  text-align: center;
 }
 
 #time {
@@ -77,6 +134,10 @@ div {
   justify-content: space-evenly;
   font-size: 1rem;
   flex-direction: column;
+  box-shadow: rgb(50 50 93 / 25%) 0px 6px 12px -2px, rgb(0 0 0 / 30%) 0px 3px 7px -3px;
+  border-radius: 20px;
+  background-color: var(--main-highlight);
+  padding: 0px 15px;
 }
 
 #time div input, #time div button {
@@ -86,7 +147,8 @@ div {
 #time div input {
   width: 12vw;
   font-size: 8vw;
-  text-align: center;
+  text-align: center;  
+  font-family: "Quicksand", sans-serif;
 }
 
 #hoursTypeContainer {
@@ -97,10 +159,21 @@ div {
 
 #hoursType {
   font-size: 6vw;
+  background-color: #0000;
+  border: none;
+  color: var(--main-font-color);
+  text-decoration: underline dashed;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+}
+
+select#hoursType option {
+  color: var(--main-black);
 }
 
 #hoursTypeLabel {
   font-size: 6vw;
+  text-shadow: 1px 1px 5px #555;
 }
 
 #submitHours {
@@ -126,3 +199,158 @@ div {
   background: var(--main-font-color);
 }
 
+#footer i {
+  cursor: pointer;
+}
+
+#mainMenu {
+  left: 0%;
+}
+
+#orgMenu {
+  left: 100%;
+  display: grid;
+  text-align: center;
+  grid-template-rows: 2rem 11rem 1fr 8rem 1rem;
+}
+
+#mainMenu, #orgMenu {
+  transition: .5s all;
+  position: absolute;
+  z-index: 10;
+  bottom: 0%;
+  margin: 0px;
+  padding: 5%;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  background: var(--main-font-color);
+  color: var(--main-black);
+  font-size: 1.5rem;
+}
+
+#mainMenu div {
+  font-size: 2rem;
+}
+
+div#login {
+  margin-left: 1em;
+  margin-top: 2em;
+  text-shadow: 1px 1px 1px #3332;
+}
+
+#close {
+  position: absolute;
+  right: 5vw;
+  top: 5vw;
+}
+
+#menuItems li {
+  list-style-type: none;
+  display: flex;
+  margin: 1em 0px 1em 1em;
+  cursor: pointer;
+}
+
+#menuItems i {
+  margin-right: 1em;
+  width: 1em;
+}
+
+#addOrg {
+  grid-area: 2/1/3/2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#addOrgInputs {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+#addOrgInputs input {
+  text-align: center;
+  font-size: 2rem;
+  width: 8rem;
+  margin-right: 0.5rem;
+}
+
+#orgList {
+  grid-area: 3/1/4/2;
+}
+
+#showCreateOrg button {
+  border: 1px solid black;
+  font-size: 1.5rem;
+  height: 3rem;
+}
+
+#fetchingOrgs {
+  position: relative;
+  top: 20%;
+  left: calc(50% - 48px);
+  background: url(/images/logo.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 96px;
+  width: 96px;
+}
+
+#orgs {
+  padding-top: 1rem;
+}
+
+.org { 
+  display: flex;
+  justify-content: center;
+}
+
+.orgName {
+  margin-right: 2rem;
+}
+
+#createOrgContainer {
+  grid-area: 4/1/5/2;
+  position: relative;
+}
+
+#createOrg {
+  font-size: 1.5rem;
+  height: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+#createOrg input {
+  text-align: center;
+  font-size: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#createOrg button {
+  margin-top: 1rem;
+  font-size: 2rem;
+  border: 1px solid var(--main-black);
+}
+
+#showCreateOrg {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  z-index: 3;
+}
+
+#showCreateOrg, #createOrg {
+  transition: .2s all;
+  background: var(--main-font-color);
+  height:8rem;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 100%;
+}
