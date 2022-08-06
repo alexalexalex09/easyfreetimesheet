@@ -1,13 +1,16 @@
 extends layout
 
+block scripts 
+  script(type="text/javascript" src="/javascripts/index.js")
+
 block content
   #main-container
     #hoursPrompt Enter your hours
     #date
-      button#yesterday(onclick="changeInput('#dateInput', -1)")
+      button#yesterday(onclick="document.querySelector('#dateInput').stepDown()")
         i.rightArrow.fa-solid.fa-arrow-left-long
       input#dateInput(type="date")
-      button#tomorrow(onclick="changeInput('#dateInput', 1)")
+      button#tomorrow(onclick="document.querySelector('#dateInput').stepUp()")
         i.rightArrow.fa-solid.fa-arrow-right-long
     #time
       #hours 
@@ -18,50 +21,16 @@ block content
         button#minutesPlus(onclick="changeInput('#minutesInput', 15)") +15
         input#minutesInput(type="number" step="15" value="0" min="0")
         button#minutesMinus(onclick="changeInput('#minutesInput', -15)") -15
+    #timeLabels
+      label(for="hoursInput") Hours 
+      label(for="minutesInput") Minutes 
     #hoursTypeContainer
       label#hoursTypeLabel(for="hoursType") Type of hours: 
       select#hoursType(name="hoursType")
         option(value="worked") Worked
         option(value="vacation") Vacation
     button#submitHours(type="submit" onclick="submitHours()") Submit
-    #error.hidden
-    #hoursList
   #footer
     i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
-    i#historyButton.fa-solid.fa-clock-rotate-left
-    i#calendarViewButton.fa-solid.fa-calendar
-  #mainMenu.small
-    #close.clickable.hidden(onclick="toggleMenu()")
-      i.fa-solid.fa-x
-    if user
-      #menuItems.hidden
-        li#userDisplay
-          i.fa-solid.fa-user
-          #username #{user.displayName}
-        li#organizations
-          i(class='fa-solid fa-building-user')
-          #joinNewOrg(onclick="showOrgMenu()") Organizations
-        li#logoutItem(onclick="window.location='/logout'")
-          i(class='fa-solid fa-right-from-bracket')
-          #logout
-            | Logout
-    else
-      #login.clickable.hidden(onclick="window.location='/login'") Login 
-  #orgMenu.hidden
-    #close.clickable(onclick="closeOrgMenu()")
-      i.fa-solid.fa-x
-    #addOrg 
-      label(for="addOrg") Enter code to join a new organization
-      #addOrgInputs 
-        input(type="text" maxlength="5")
-        i#addOrgSubmit.fa-solid.fa-check.clickable(onclick='joinOrg()')
-    #orgList 
-      #orgListTitle Your organizations: 
-      #fetchingOrgs.loading
-      #orgs
-    #createOrgContainer  
-      #showCreateOrg
-        button(onclick="showCreateOrg()") Create a new organization
-      #createOrg
-        input(type="text")
-        button(onclick="createOrg()") Create My Org
+    i#historyButton.fa-solid.fa-clock-rotate-left(onclick="window.location='/hours'")
+  include menu

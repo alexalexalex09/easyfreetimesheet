@@ -9,7 +9,8 @@ var HoursSchema = new Schema(
     minutes: Number,
     type: String,
     user: { type: Schema.Types.ObjectId, ref: "User" },
-    date: String,
+    user_profile_id: String,
+    date: Date,
   },
   {
     collection: "hours",
