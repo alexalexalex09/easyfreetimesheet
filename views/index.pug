@@ -4,8 +4,8 @@ block scripts
   script(type="text/javascript" src="/javascripts/index.js")
 
 block content
-  #main-container
-    #hoursPrompt Enter your hours
+  #indexContainer.mainContainer
+    #hoursPrompt.pageTitle Enter your hours
     #date
       button#yesterday(onclick="document.querySelector('#dateInput').stepDown()")
         i.rightArrow.fa-solid.fa-arrow-left-long
@@ -32,5 +32,7 @@ block content
     button#submitHours(type="submit" onclick="submitHours()") Submit
   #footer
     i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
-    i#historyButton.fa-solid.fa-clock-rotate-left(onclick="window.location='/hours'")
+    if user
+      i#historyButton.fa-solid.fa-clock-rotate-left(onclick="window.location='/hours'")
+      i#calendarViewButton.fa-solid.fa-calendar(onclick="window.location='/calendar'")
   include menu

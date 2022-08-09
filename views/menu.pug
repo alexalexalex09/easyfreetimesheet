@@ -1,0 +1,32 @@
+#mainMenu.small
+  #close.clickable.hidden(onclick="toggleMenu()")
+    i.fa-solid.fa-x
+  if user
+    #menuItems.hidden
+      li#userDisplay
+        i.fa-solid.fa-user
+        #username #{user.displayName}
+      li#organizations
+        i(class='fa-solid fa-building-user')
+        #joinNewOrg(onclick="showOrgMenu()") Organizations
+      li#logoutItem(onclick="window.location='/logout'")
+        i(class='fa-solid fa-right-from-bracket')
+        #logout
+          | Logout
+  else
+    #login.clickable.hidden(onclick="window.location='/login'") Login 
+#orgMenu.right.hidden
+  #close.clickable(onclick="closeOrgMenu()")
+    i.fa-solid.fa-x
+  #addOrg 
+    label(for="addOrg") Enter code to join a new organization
+    #addOrgInputs 
+      input(type="text" maxlength="5")
+      i#addOrgSubmit.fa-solid.fa-check.clickable(onclick='joinOrg()')
+  #orgList 
+    #orgListTitle Your organizations: 
+    #orgs
+  #createOrg
+    a(href="/myOrgs")
+      em Owners: click here to manage organizations 
+

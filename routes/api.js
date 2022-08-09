@@ -7,6 +7,8 @@ const PayPeriod = require("../models/payPeriods");
 const Hours = require("../models/hours");
 const { body, validationResult } = require("express-validator");
 
+const ERR_LOGIN = { err: "Not logged in" };
+
 function makeid(length = 5, checkList = []) {
   //TODO: Filter out bad words
   var result = "";
@@ -53,8 +55,15 @@ router.post(
   ash(async function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.send({ errors: errors.array() });
+      res.send({ err: errors.array()[0] });
+      return;
     } else {
+      if (req.body.hours == 0 && req.body.minutes == 0) {
+        res.send({ err: "No time recorded!" });
+      }
+      if (!req.user) {
+        res.send(ERR_LOGIN);
+      }
       const curUser = await User.findOne({ profile_id: req.user.id });
       const newHours = new Hours({
         hours: req.body.hours,
@@ -78,6 +87,10 @@ router.post(
 router.post(
   "/getOrgs",
   ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
     const curUser = await User.findOne(
       { profile_id: req.user.id },
       "name organizations"
@@ -95,6 +108,10 @@ router.post(
 router.post(
   "/getMyOrgs",
   ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
     const curUser = await User.findOne({ profile_id: req.user.id }).exec();
     const orgs = await Organization.find(
       {
@@ -135,11 +152,17 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.send({ errors: errors.array() });
+    }
+    if (req.body.name.length <= 0) {
+      res.send({ err: "Organization name cannot be blank" });
     } else {
-      if (req.body.name.length <= 0) {
-        res.send({ err: "Organization name cannot be blank" });
+      if (!req.user) {
+        res.send(ERR_LOGIN);
+        return;
       } else {
-        const curUser = await User.findOne({ profile_id: req.user.id }).exec();
+        const curUser = await User.findOne({
+          profile_id: req.user.id,
+        }).exec();
         const theCode = await makeid();
         const newOrg = new Organization({
           name: req.body.name,
@@ -161,23 +184,32 @@ router.post(
 
 router.post(
   "/joinOrg",
+  [body("code").trim().escape().stripLow()],
   ash(async function (req, res, next) {
-    curOrganization = await Organization.findOne({
-      code: req.body.code,
-    }).exec();
-    curUser = await User.findOne({ profile_id: req.user.id })
-      .populate("organizations", "code")
-      .exec();
-    if (
-      curUser.organizations.findIndex(function (el) {
-        return req.body.code == el.code;
-      }) == -1
-    ) {
-      curUser.organizations.push(curOrganization._id);
-      await curUser.save();
-      res.send({ success: "success" });
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
     } else {
-      res.send({ err: "Already joined" });
+      if (req.body.code.length < 5) {
+        res.send({ err: "Invalid code" });
+      }
+      curOrganization = await Organization.findOne({
+        code: req.body.code,
+      }).exec();
+      curUser = await User.findOne({ profile_id: req.user.id })
+        .populate("organizations", "code")
+        .exec();
+      if (
+        curUser.organizations.findIndex(function (el) {
+          return req.body.code == el.code;
+        }) == -1
+      ) {
+        curUser.organizations.push(curOrganization._id);
+        await curUser.save();
+        res.send({ success: "success" });
+      } else {
+        res.send({ err: "Already joined" });
+      }
     }
   })
 );
@@ -185,6 +217,10 @@ router.post(
 router.post(
   "/getHours",
   ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
     theHours = await Hours.find({ user_profile_id: req.user.id });
     res.send(theHours);
   })

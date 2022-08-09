@@ -1,0 +1,47 @@
+extends layout
+
+block scripts 
+  script(type="text/javascript" src="/javascripts/calendar.js")
+  script(type="text/javascript" src="/javascripts/luxon.min.js")
+
+block content
+  #calendarContainer.mainContainer
+    #calendarTitle.pageTitle Calendar 
+    calendarInfoItem.hidden
+    #calendar
+      #dateBar
+        i.fa-solid.fa-angles-left.clickable(onclick="changeMonth(-1)") 
+        #month.clickable(onclick="showSelectMonth()")
+        #year.clickable(onclick="showSelectYear()") 
+        i.fa-solid.fa-angles-right.clickable(onclick="changeMonth(1)")
+      #weekDays
+        .weekDay Sun
+        .weekDay Mon 
+        .weekDay Tue 
+        .weekDay Wed 
+        .weekDay Thu 
+        .weekDay Fri 
+        .weekDay Sat
+      #dates 
+    #calendarShadow.hidden(onclick="closeModals()")
+    #yearModal.hidden 
+      #yearModalTitle Input Year
+      input(type="number" max="3000" min="2000")
+      button(type="submit" onclick="setYear()") Go
+    #monthModal.hidden
+      .monthModalOption.clickable(onclick="setMonth(1)") Jan 
+      .monthModalOption.clickable(onclick="setMonth(2)") Feb 
+      .monthModalOption.clickable(onclick="setMonth(3)") Mar 
+      .monthModalOption.clickable(onclick="setMonth(4)") Apr 
+      .monthModalOption.clickable(onclick="setMonth(5)") May 
+      .monthModalOption.clickable(onclick="setMonth(6)") Jun 
+      .monthModalOption.clickable(onclick="setMonth(7)") Jul 
+      .monthModalOption.clickable(onclick="setMonth(8)") Aug 
+      .monthModalOption.clickable(onclick="setMonth(9)") Sep 
+      .monthModalOption.clickable(onclick="setMonth(10)") Oct 
+      .monthModalOption.clickable(onclick="setMonth(11)") Nov
+      .monthModalOption.clickable(onclick="setMonth(12)") Dec
+  #footer
+    i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
+    i#homeButton.fa-solid.fa-house(onclick="window.location='/'")
+  include menu

@@ -19,14 +19,14 @@ function efsFetch(req, body, handler, errorHandler) {
   if (body === "") {
     body = {};
   }
-  const tts_options = {
+  const efs_options = {
     method: "POST",
     body: JSON.stringify(body),
     headers: {
       "Content-Type": "application/json",
     },
   };
-  fetch(req, tts_options).then(function (response) {
+  fetch(req, efs_options).then(function (response) {
     return response.json().then((res) => {
       if (res.err) {
         if (errorHandler) {

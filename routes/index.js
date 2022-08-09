@@ -14,4 +14,8 @@ router.get("/hours", function (req, res, next) {
   res.render("hours", { title: "Easy Free Timesheet" });
 });
 
+router.get("/calendar", function (req, res, next) {
+  res.render("calendar", { title: "Easy Free Timesheet" });
+});
+
 module.exports = router;
