@@ -12,6 +12,10 @@ window.addEventListener("load", function () {
     ).value.toUpperCase();
   });
 
+  getMenuOrgs();
+});
+
+function getMenuOrgs() {
   efsFetch(
     "/api/getOrgs",
     {},
@@ -20,22 +24,22 @@ window.addEventListener("load", function () {
       for (const org of res) {
         htmlString += `<div class="org"><div class="orgName">${org.name}</div><div class="orgCode">${org.code}</div></div>`;
       }
-      $("#orgs").innerHTML = htmlString;
+      $("#menuOrgs").innerHTML = htmlString;
     },
     function (err) {
       switch (err.err) {
         case "none":
-          $("#orgs").innerHTML = `
+          $("#menuOrgs").innerHTML = `
       <div class="error">No organizations found</div>`;
           break;
         default:
-          $("#orgs").innerHTML = `
+          $("#menuOrgs").innerHTML = `
       <div class="error">Error: ${err.err}</div>`;
           break;
       }
     }
   );
-});
+}
 
 function toggleMenu() {
   $("#mainMenu").classList.toggle("small");
@@ -70,6 +74,6 @@ function joinOrg() {
   const body = { code: $("#addOrgInputs input").value };
   efsFetch("/api/joinOrg", body, function (res) {
     $("#addOrgInputs input").value = "";
-    efsFetch("/api/getOrgs", {}, function (res) {});
+    getMenuOrgs();
   });
 }

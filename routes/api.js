@@ -6,6 +6,8 @@ const Organization = require("../models/organizations");
 const PayPeriod = require("../models/payPeriods");
 const Hours = require("../models/hours");
 const { body, validationResult } = require("express-validator");
+const { Settings, DateTime } = require("luxon");
+Settings.defaultZoneName = "utc";
 
 const ERR_LOGIN = { err: "Not logged in" };
 
@@ -64,6 +66,8 @@ router.post(
       if (!req.user) {
         res.send(ERR_LOGIN);
       }
+      var dt = DateTime.fromISO(req.body.date);
+      dt = dt.setZone("utc", { keepLocalTime: true });
       const curUser = await User.findOne({ profile_id: req.user.id });
       const newHours = new Hours({
         hours: req.body.hours,
@@ -71,7 +75,7 @@ router.post(
         type: req.body.type,
         user: curUser._id,
         user_profile_id: curUser.profile_id,
-        date: req.body.date,
+        date: dt,
       });
       newHours.save().then(function (curHours, err) {
         if (err) {
@@ -128,23 +132,62 @@ router.post(
 );
 
 function defaultPayPeriods(owner) {
-  var payPeriodsArray = [];
-  const date = new Date(Date.UTC(Date.now()));
-  const year = date.getFullYear();
-  for (var i = 1; i <= 24; i++) {
-    const start = new Date(
-      Date.UTC(year, Math.ceil(i / 2) - 1, ((i + 1) % 2) * 15 + 1)
+  let promise = new Promise(function (resolve, reject) {
+    var payPeriodsArray = [];
+    var dt = DateTime.now();
+    const year = dt.year;
+    for (var i = 1; i <= 12; i++) {
+      var start = DateTime.fromObject(
+        {
+          year: year,
+          month: i,
+          day: 1,
+        },
+        { zone: "utc" }
+      );
+      var end = DateTime.fromObject(
+        {
+          year: year,
+          month: i,
+          day: 15,
+        },
+        { zone: "utc" }
+      );
+      console.log({ start });
+      start = new Date(start.toISO());
+      console.log({ start });
+      end = new Date(end.toISO());
+      payPeriodsArray.push({
+        insertOne: { document: { owner: owner, start: start, end: end } },
+      });
+      start = DateTime.fromObject(
+        {
+          year: year,
+          month: i,
+          day: 16,
+        },
+        { zone: "utc" }
+      );
+      end = start.endOf("month");
+      start = new Date(start.toISO());
+      end = new Date(end.toISO());
+      payPeriodsArray.push({
+        insertOne: { document: { owner: owner, start: start, end: end } },
+      });
+    }
+    PayPeriod.bulkWrite(payPeriodsArray).then(
+      function (payPeriods) {
+        resolve(payPeriods.insertedIds);
+      },
+      function (err) {
+        console.log({ payPeriodsArray });
+        console.log({ err });
+      }
     );
-    const next = new Date(
-      Date.UTC(year, Math.ceil((i + 1) / 2) - 1, ((i + 2) % 2) * 15 + 1)
-    );
-    const end = new Date(Date.UTC(next - 1));
-    payPeriodsArray.push({ owner: owner, start: start, end: end });
-  }
-  return payPeriodsArray;
+  });
+  return promise;
 }
 
-//TODO: Sanitize input
 router.post(
   "/createOrg",
   [body("name").trim().escape().stripLow()],
@@ -168,11 +211,16 @@ router.post(
           name: req.body.name,
           owners: [curUser._id],
           code: theCode,
-          approvedPayPeriods: [],
+          approvedPayPeriods: {
+            users: [],
+            payPeriods: [],
+          },
         });
         var theOrg = await newOrg.save();
-        theOrg.approvedPayPeriods = defaultPayPeriods();
-        await theOrg.save();
+        var payPeriods = await defaultPayPeriods(theOrg);
+        payPeriods = Object.values(payPeriods);
+        theOrg.approvedPayPeriods.payPeriods = payPeriods;
+        var err = await theOrg.save();
         const orgs = await Organization.find({
           owner: curUser._id,
         }).exec();
@@ -221,8 +269,30 @@ router.post(
       res.send(ERR_LOGIN);
       return;
     }
-    theHours = await Hours.find({ user_profile_id: req.user.id });
+    theHours = await Hours.find(
+      { user_profile_id: req.user.id },
+      "-user -user_profile_id"
+    );
     res.send(theHours);
+  })
+);
+
+router.post(
+  "/getPeriods",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    const curUser = await User.findOne({ profile_id: req.user.id })
+      .populate("organizations", "code")
+      .exec();
+    const curPeriods = await PayPeriod.find({
+      owner: { $in: curUser.organizations },
+    })
+      .populate("owner", "name")
+      .exec();
+    res.send(curPeriods);
   })
 );
 

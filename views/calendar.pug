@@ -3,6 +3,7 @@ extends layout
 block scripts 
   script(type="text/javascript" src="/javascripts/calendar.js")
   script(type="text/javascript" src="/javascripts/luxon.min.js")
+  script(type="text/javascript" src="/javascripts/localforage.min.js")
 
 block content
   #calendarContainer.mainContainer
@@ -23,6 +24,9 @@ block content
         .weekDay Fri 
         .weekDay Sat
       #dates 
+    #periodLegend
+      #periodLegendTitle
+      #legendList
     #calendarShadow.hidden(onclick="closeModals()")
     #yearModal.hidden 
       #yearModalTitle Input Year

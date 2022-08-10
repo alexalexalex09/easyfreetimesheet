@@ -6,6 +6,10 @@ if (typeof $$ == "undefined") {
 }
 
 window.addEventListener("load", function () {
+  loadMyOrgs();
+});
+
+function loadMyOrgs() {
   efsFetch(
     "/api/getMyOrgs",
     {},
@@ -17,7 +21,6 @@ window.addEventListener("load", function () {
       $("#orgs").innerHTML = htmlString;
     },
     function (err) {
-      $("#fetchingOrgs").classList.add("hidden");
       switch (err.err) {
         case "none":
           $("#orgs").innerHTML = `
@@ -30,7 +33,7 @@ window.addEventListener("load", function () {
       }
     }
   );
-});
+}
 
 function createOrg() {
   if ("#createOrg input".value != "") {
@@ -40,6 +43,7 @@ function createOrg() {
     efsFetch("/api/createOrg", body, function (res) {
       console.log("Success!");
       $("#createOrg input").value = "Success!";
+      loadMyOrgs();
     });
   }
 }

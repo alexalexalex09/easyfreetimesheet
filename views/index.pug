@@ -26,7 +26,7 @@ block content
       label(for="minutesInput") Minutes 
     #hoursTypeContainer
       label#hoursTypeLabel(for="hoursType") Type of hours: 
-      select#hoursType(name="hoursType")
+      select#hoursType.selector(name="hoursType")
         option(value="worked") Worked
         option(value="vacation") Vacation
     button#submitHours(type="submit" onclick="submitHours()") Submit

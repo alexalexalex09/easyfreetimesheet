@@ -194,7 +194,7 @@ div {
   justify-self: center;
 }
 
-#hoursType {
+.selector {
   font-size: 2rem;
   background-color: #0000;
   border: none;
@@ -204,7 +204,7 @@ div {
   font-family: "Quicksand", sans-serif;
 }
 
-select#hoursType option {
+select.selector option {
   color: var(--main-black);
 }
 
@@ -555,6 +555,45 @@ div#login {
 #yearModal button {
   padding: 10px 50px;
 }
+
+.periodEnd:after, .currentPeriodEnd:after {
+  content: "]";
+  color: red;
+  transform: translateY(-3px);
+  font-size: 1.4rem;
+  position: absolute;
+}
+
+.periodStart:before, .currentPeriodStart:before {
+  content: "[";
+  color: red;
+  transform: translate(-9px, -3px);
+  font-size: 1.4rem;
+  position: absolute;
+}
+
+.currentPeriodEnd:after, .currentPeriodStart:before {
+  font-weight: bold;
+}
+
+#periodLegend {
+  grid-area: 6/2/7/10;
+  font-size: 1.5rem;
+}
+
+#periodLegendTitle {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+#legendList select {
+  font-size: 1.5rem;
+}
+
+.hoursPresent {
+  background-color: #d336
+}
+
 
 
 
