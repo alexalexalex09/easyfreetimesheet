@@ -2,8 +2,6 @@ extends layout
 
 block scripts 
   script(type="text/javascript" src="/javascripts/calendar.js")
-  script(type="text/javascript" src="/javascripts/luxon.min.js")
-  script(type="text/javascript" src="/javascripts/localforage.min.js")
 
 block content
   #calendarContainer.mainContainer
@@ -12,8 +10,9 @@ block content
     #calendar
       #dateBar
         i.fa-solid.fa-angles-left.clickable(onclick="changeMonth(-1)") 
-        #month.clickable(onclick="showSelectMonth()")
-        #year.clickable(onclick="showSelectYear()") 
+        #dateBarDateContainer
+          span#dateBarMonth.clickable(onclick="showSelectMonth()")
+          span#dateBarYear.clickable(onclick="showSelectYear()") 
         i.fa-solid.fa-angles-right.clickable(onclick="changeMonth(1)")
       #weekDays
         .weekDay Sun

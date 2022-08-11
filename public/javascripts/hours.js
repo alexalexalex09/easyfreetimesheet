@@ -6,13 +6,16 @@ if (typeof $$ == "undefined") {
 }
 
 window.addEventListener("load", function () {
+  DateTime = luxon.DateTime;
   efsFetch("/api/getHours", {}, function (res) {
     var htmlString = "";
     res.forEach(function (hours) {
       if (hours.minutes == "0") {
         hours.minutes = "00";
       }
-      var hoursDate = new Date(hours.date).toLocaleDateString("en-US");
+      var hoursDate = DateTime.fromISO(hours.date, {
+        zone: "utc",
+      }).toLocaleString();
       htmlString += `
       <div class="hoursDisplay">
         <div class="timeDisplay">${hours.hours}:${hours.minutes}</div>

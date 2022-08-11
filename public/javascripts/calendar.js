@@ -2,17 +2,21 @@ if (typeof $ == "undefined") {
   $ = (selector) => document.querySelector(selector);
 }
 if (typeof $$ == "undefined") {
-  $$ = document.querySelectorAll;
+  $$ = (selector) => document.querySelectorAll(selector);
 }
 
 window.addEventListener("load", function () {
   DateTime = luxon.DateTime;
   efsFetch("/api/getPeriods", {}, function (res) {
-    storePayPeriods(res);
-    calendarInit();
-    efsFetch("/api/getHours", {}, function (res) {
-      localforage.setItem("hours", res).then(function () {
-        showHours();
+    storePayPeriods(res).then(function (res) {
+      calendarInit();
+      const thisMonth = $("calendarInfoItem").getAttribute("data-month");
+      console.log({ res });
+      showOrgList(res, thisMonth);
+      efsFetch("/api/getHours", {}, function (res) {
+        localforage.setItem("hours", res).then(function () {
+          showHours();
+        });
       });
     });
   });
@@ -101,8 +105,8 @@ function setCalendar(luxonDateTime) {
       zone: "utc",
     }
   );
-  $("#year").innerHTML = dt.year;
-  $("#month").innerHTML = dt.monthLong;
+  $("#dateBarYear").innerHTML = dt.year;
+  $("#dateBarMonth").innerHTML = dt.monthLong;
   var htmlString = "";
   if (day.weekday == 7) {
     htmlString = `<div class="calendarDay calendarStartSpace" style="display:none"></div>`;
@@ -134,29 +138,35 @@ function setCalendar(luxonDateTime) {
     owner = $("#legendList select").value;
   }
   showPayPeriods(owner);
+  showHours();
 }
 
 function storePayPeriods(payPeriods) {
-  let storage = [];
-  payPeriods.forEach(function (v) {
-    const periodStart = DateTime.fromISO(v.start, { zone: "utc" });
-    const periodEnd = DateTime.fromISO(v.end, { zone: "utc" });
-    storage.push({
-      periodStart: {
-        day: periodStart.day,
-        month: periodStart.month,
-        year: periodStart.year,
-        owner: v.owner,
-      },
-      periodEnd: {
-        day: periodEnd.day,
-        month: periodEnd.month,
-        year: periodEnd.year,
-        owner: v.owner,
-      },
+  var promise = new Promise(function (resolve, reject) {
+    let storage = [];
+    payPeriods.forEach(function (v) {
+      const periodStart = DateTime.fromISO(v.start, { zone: "utc" });
+      const periodEnd = DateTime.fromISO(v.end, { zone: "utc" });
+      storage.push({
+        periodStart: {
+          day: periodStart.day,
+          month: periodStart.month,
+          year: periodStart.year,
+          owner: v.owner,
+        },
+        periodEnd: {
+          day: periodEnd.day,
+          month: periodEnd.month,
+          year: periodEnd.year,
+          owner: v.owner,
+        },
+      });
+    });
+    localforage.setItem("payPeriods", storage).then(function (res) {
+      resolve(storage);
     });
   });
-  localforage.setItem("payPeriods", storage);
+  return promise;
 }
 
 function showPayPeriods(owner) {
@@ -176,46 +186,62 @@ function showPayPeriods(owner) {
     if (thisMonth == todayMonth) {
       showTodayPayPeriods(payPeriods, today, todayMonth, thisMonth);
     }
-    showCurrentPayPeriods(payPeriods, thisMonth);
+    updatePayPeriods(payPeriods, thisMonth);
+    showHours();
   });
 }
 
-function showCurrentPayPeriods(payPeriods, thisMonth) {
+function showOrgList(payPeriods, thisMonth) {
+  var monthPayPeriods = payPeriods.filter(function (v) {
+    return v.periodStart.month == thisMonth || v.periodEnd.month == thisMonth;
+  });
+  var orgCodes = [];
+  monthPayPeriods.forEach(function (v) {
+    orgCodes.push(v.periodStart.owner.code);
+    orgCodes.push(v.periodEnd.owner.code);
+  });
+  var orgCodeList = [...new Set(orgCodes)];
+  var orgNameList = [];
+  orgCodeList.forEach(function (orgCode) {
+    const orgName = payPeriods.find(function (payPeriod) {
+      return payPeriod.periodStart.owner.code == orgCode;
+    });
+    orgNameList.push({ code: orgCode, name: orgName.periodStart.owner.name });
+  });
+  console.log({ orgNameList });
+  if (orgNameList.length > 1) {
+    showOrgNameDropDown(orgNameList);
+  }
+}
+
+function updatePayPeriods(payPeriods, thisMonth) {
   var monthPayPeriods = payPeriods.filter(function (v) {
     return v.periodStart.month == thisMonth || v.periodEnd.month == thisMonth;
   });
   monthPayPeriods.forEach(function (period) {
     $(".day" + period.periodStart.day).classList.add("periodStart");
     $(".day" + period.periodStart.day).classList.add(
-      "owner-" + period.periodStart.owner.name
+      "owner-" + period.periodStart.owner.code
     );
     $(".day" + period.periodEnd.day).classList.add("periodEnd");
     $(".day" + period.periodEnd.day).classList.add(
-      "owner-" + period.periodEnd.owner.name
+      "owner-" + period.periodEnd.owner.code
     );
   });
-  var orgNames = [];
-  monthPayPeriods.forEach(function (v) {
-    orgNames.push(v.periodStart.owner.name);
-    orgNames.push(v.periodEnd.owner.name);
-  });
-  var orgNameList = [...new Set(orgNames)];
-  if (orgNameList.length > 1) {
-    showOrgNameDropDown(orgNameList);
-  }
 }
 
 function showOrgNameDropDown(orgNameList) {
   $("#periodLegendTitle").innerHTML = "Select Organization:";
-  var htmlString = '<select name="periodList" class="selector">';
-  orgNameList.forEach(function (orgName, i) {
-    htmlString += `<option value="${orgName}">${orgName}</option>`;
+  var htmlString =
+    '<select name="periodList" id="periodList" class="selector">';
+  orgNameList.forEach(function (orgCode, i) {
+    htmlString += `<option value="${orgCode.code}">${orgCode.name}</option>`;
   });
   htmlString += "</select>";
   $("#legendList").innerHTML = htmlString;
   setTimeout(function () {
-    $("#legendList select").addEventListener("change", function (e) {
-      showPayPeriods((owner = $("#legendList select").value));
+    $("#periodList").addEventListener("change", function (e) {
+      showPayPeriods($("#periodList").value);
     });
   }, 1);
 }
@@ -245,41 +271,81 @@ function showTodayPayPeriods(payPeriods, today, todayMonth, thisMonth) {
 }
 
 function showHours() {
-  localforage.getItem("hours").then(function (hours) {
-    var currentMonth = $("calendarInfoItem").getAttribute("data-month");
-    console.log({ currentMonth });
-    hours.forEach(function (v) {
-      var d = DateTime.fromISO(v.date, { zone: "utc" });
-      if (d.month == currentMonth) {
-        var hours = 0;
-        switch (v.minutes) {
-          case 0:
-            hours = v.hours;
-            break;
-          case 15:
-            hours = v.hours + "&frac14;";
-            break;
-          case 30:
-            hours = v.hours + "&frac12;";
-            break;
-          case 45:
-            hours = v.hours + "&frac34;";
-            break;
-        }
-        $(".day" + d.day).innerHTML += `
-        <div class="hoursNotificationContainer">
-          <div class="hoursNotificationText clickable" onclick="showHoursDetail('${v.date}')">${hours}</div>
-        </div>`;
-      }
-    });
+  $$(".hoursNotificationContainer").forEach(function (el) {
+    el.remove();
   });
+  localforage.getItem("hours").then(function (hoursRecords) {
+    hoursRecords = hoursRecords.filter(function (v) {
+      return v.organization.code == $("#periodList").value;
+    });
+    var currentMonth = $("calendarInfoItem").getAttribute("data-month");
+    var currentYear = $("calendarInfoItem").getAttribute("data-year");
+    var lastDay = DateTime.fromObject(
+      {
+        day: 1,
+        month: currentMonth,
+        year: currentYear,
+      },
+      { zone: "utc" }
+    ).endOf("month").day;
+    for (var day = 1; day <= lastDay; day++) {
+      const date = DateTime.fromObject(
+        {
+          day: day,
+          month: currentMonth,
+          year: currentYear,
+        },
+        { zone: "utc" }
+      );
+      const hours = getDayHours(hoursRecords, date);
+      if (hours != "") {
+        $(".day" + day).innerHTML += `
+          <div class="hoursNotificationContainer">
+            <div class="hoursNotificationText clickable" onclick="showHoursDetail('${date.toISO()}')">${hours}</div>
+          </div>`;
+      }
+    }
+  });
+}
+
+function getDayHours(hoursRecords, d) {
+  var hours = 0;
+  var minutes = 0;
+  hoursRecords = hoursRecords.filter(function (v) {
+    vDate = DateTime.fromISO(v.date, { zone: "utc", keepLocalTime: true });
+    return vDate.month == d.month && vDate.day == d.day;
+  });
+
+  hoursRecords.forEach(function (v) {
+    hours += Number.parseInt(v.hours);
+    minutes += Number.parseInt(v.minutes);
+  });
+  hours += Math.floor(minutes / 60);
+  minutes = minutes % 60;
+  switch (minutes) {
+    case 0:
+      hours = hours;
+      break;
+    case 15:
+      hours = hours + "&frac14;";
+      break;
+    case 30:
+      hours = hours + "&frac12;";
+      break;
+    case 45:
+      hours = hours + "&frac34;";
+      break;
+  }
+  return hours;
 }
 
 function showHoursDetail(isoDate) {
   localforage.getItem("hours").then(function (hours) {
     var hoursIndices = [];
     var hoursRecord = hours.filter(function (v, i) {
-      hoursIndices.push(i);
+      if (v.date == isoDate) {
+        hoursIndices.push(i);
+      }
       return v.date == isoDate;
     });
     const date = DateTime.fromISO(isoDate, { zone: "utc" });
@@ -288,13 +354,13 @@ function showHoursDetail(isoDate) {
     ).innerHTML = `<div class="hoursDetailDate">${date.toLocaleString()}</div>`;
     var htmlString = ``;
     hoursRecord.forEach(function (record, index) {
+      console.log({ record });
+      var hours = record.hours + ":";
+      hours += record.minutes == "0" ? "00" : record.minutes;
+      hours += " " + record.type;
       htmlString += `
-      <div class="hoursDetailRecord clickable" onclick="editRecord('${
-        hoursIndices[index]
-      }')">
-        <div class="hoursDetailHours">${record.hours}:${
-        record.minutes == "0" ? "00" : record.minutes
-      }</div>
+      <div class="hoursDetailRecord clickable" onclick="editRecord('${hoursIndices[index]}')">
+        <div class="hoursDetailHours">${hours}</div>
         <div class="hoursDetailEdit"><i class="fa-solid fa-pen-to-square"></i></div>
       </div>`;
     });

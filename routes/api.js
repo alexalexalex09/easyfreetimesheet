@@ -297,7 +297,7 @@ router.post(
     const curPeriods = await PayPeriod.find({
       owner: { $in: curUser.organizations },
     })
-      .populate("owner", "name")
+      .populate("owner", "name code")
       .exec();
     res.send(curPeriods);
   })

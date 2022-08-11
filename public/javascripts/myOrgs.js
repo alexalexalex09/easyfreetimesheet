@@ -2,7 +2,7 @@ if (typeof $ == "undefined") {
   $ = (selector) => document.querySelector(selector);
 }
 if (typeof $$ == "undefined") {
-  $$ = document.querySelectorAll;
+  $$ = (selector) => document.querySelectorAll(selector);
 }
 
 window.addEventListener("load", function () {
