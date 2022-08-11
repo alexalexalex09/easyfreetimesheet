@@ -32,7 +32,11 @@ function efsFetch(req, body, handler, errorHandler) {
         if (errorHandler) {
           errorHandler(res);
         } else {
-          createAndShowAlert(res.err);
+          if (typeof res.err == "object") {
+            createAndShowAlert(res.err.msg + ": " + res.err.param);
+          } else {
+            createAndShowAlert(res.err);
+          }
         }
       } else {
         handler(res);

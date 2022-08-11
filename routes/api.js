@@ -53,6 +53,7 @@ router.post(
     body("hours").isNumeric(),
     body("minutes").isNumeric(),
     body("type").not().isEmpty().trim().escape().stripLow(),
+    body("organization").not().isEmpty().trim().escape().stripLow(),
   ],
   ash(async function (req, res, next) {
     const errors = validationResult(req);
@@ -68,11 +69,15 @@ router.post(
       }
       var dt = DateTime.fromISO(req.body.date);
       dt = dt.setZone("utc", { keepLocalTime: true });
+      const curOrganization = await Organization.findOne({
+        code: req.body.organization,
+      });
       const curUser = await User.findOne({ profile_id: req.user.id });
       const newHours = new Hours({
         hours: req.body.hours,
         minutes: req.body.minutes,
         type: req.body.type,
+        organization: curOrganization,
         user: curUser._id,
         user_profile_id: curUser.profile_id,
         date: dt,
@@ -272,7 +277,9 @@ router.post(
     theHours = await Hours.find(
       { user_profile_id: req.user.id },
       "-user -user_profile_id"
-    );
+    )
+      .populate("organization", "code name")
+      .exec();
     res.send(theHours);
   })
 );

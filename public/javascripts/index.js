@@ -19,6 +19,18 @@ window.addEventListener("load", function () {
       "#addOrgInputs input"
     ).value.toUpperCase();
   });
+
+  localforage.getItem("organizations").then(function (orgs) {
+    if (orgs.length > 1) {
+      orgs.forEach(function (org) {
+        var el = document.createElement("option");
+        el.value = org.code;
+        el.innerHTML = org.name;
+        $("#organizationSelect").appendChild(el);
+      });
+      $("#organizationSelectContainer").classList.remove("hidden");
+    }
+  });
 });
 
 function showTimePicker() {
@@ -42,11 +54,13 @@ function submitHours() {
   const theHours = $("#hoursInput").value;
   const theMinutes = $("#minutesInput").value;
   const theType = $("#hoursType").value;
+  const theOrg = $("#organizationSelect").value;
   const body = {
     date: theDate,
     hours: theHours,
     minutes: theMinutes,
     type: theType,
+    organization: theOrg,
   };
   efsFetch("/api/submit", body, function (res) {
     var htmlString = `

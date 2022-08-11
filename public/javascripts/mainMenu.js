@@ -20,6 +20,7 @@ function getMenuOrgs() {
     "/api/getOrgs",
     {},
     function (res) {
+      localforage.setItem("organizations", res);
       var htmlString = ``;
       for (const org of res) {
         htmlString += `<div class="org"><div class="orgName">${org.name}</div><div class="orgCode">${org.code}</div></div>`;

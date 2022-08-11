@@ -2,6 +2,7 @@ extends layout
 
 block scripts 
   script(type="text/javascript" src="/javascripts/index.js")
+  script(type="text/javascript" src="/javascripts/localforage.min.js")
 
 block content
   #indexContainer.mainContainer
@@ -29,6 +30,9 @@ block content
       select#hoursType.selector(name="hoursType")
         option(value="worked") Worked
         option(value="vacation") Vacation
+    #organizationSelectContainer.hidden 
+      label#organizationSelectLabel(for="organizationSelect") Organization: 
+      select#organizationSelect.selector(name="organizationSelect")
     button#submitHours(type="submit" onclick="submitHours()") Submit
   #footer
     i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")

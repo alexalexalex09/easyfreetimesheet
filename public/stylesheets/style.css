@@ -190,8 +190,10 @@ div {
 
 #hoursTypeContainer {
   grid-area: 6/1/7/11;
-  max-height: 2rem;
-  justify-self: center;
+}
+
+#organizationSelectContainer {
+  grid-area: 7/1/8/11;
 }
 
 .selector {
@@ -214,7 +216,7 @@ select.selector option {
 }
 
 #submitHours {
-  grid-area: 7/1/8/11;
+  grid-area: 8/1/9/11;
   justify-self: center;
   align-self: center;
   font-size: 2rem;
