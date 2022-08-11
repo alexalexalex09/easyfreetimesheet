@@ -84,6 +84,7 @@ function setYear() {
 function closeModals() {
   $("#monthModal").classList.add("hidden");
   $("#yearModal").classList.add("hidden");
+  $("#hoursModal").classList.add("hidden");
   $("#calendarShadow").classList.add("hidden");
 }
 
@@ -249,11 +250,57 @@ function showHours() {
     console.log({ currentMonth });
     hours.forEach(function (v) {
       var d = DateTime.fromISO(v.date, { zone: "utc" });
-      console.log(d.month + "/" + d.day);
       if (d.month == currentMonth) {
-        $(".day" + d.day).classList.add("hoursPresent");
+        var hours = 0;
+        switch (v.minutes) {
+          case 0:
+            hours = v.hours;
+            break;
+          case 15:
+            hours = v.hours + "&frac14;";
+            break;
+          case 30:
+            hours = v.hours + "&frac12;";
+            break;
+          case 45:
+            hours = v.hours + "&frac34;";
+            break;
+        }
+        $(".day" + d.day).innerHTML += `
+        <div class="hoursNotificationContainer">
+          <div class="hoursNotificationText clickable" onclick="showHoursDetail('${v.date}')">${hours}</div>
+        </div>`;
       }
     });
+  });
+}
+
+function showHoursDetail(isoDate) {
+  localforage.getItem("hours").then(function (hours) {
+    var hoursIndices = [];
+    var hoursRecord = hours.filter(function (v, i) {
+      hoursIndices.push(i);
+      return v.date == isoDate;
+    });
+    const date = DateTime.fromISO(isoDate, { zone: "utc" });
+    $(
+      "#hoursDetailDate"
+    ).innerHTML = `<div class="hoursDetailDate">${date.toLocaleString()}</div>`;
+    var htmlString = ``;
+    hoursRecord.forEach(function (record, index) {
+      htmlString += `
+      <div class="hoursDetailRecord clickable" onclick="editRecord('${
+        hoursIndices[index]
+      }')">
+        <div class="hoursDetailHours">${record.hours}:${
+        record.minutes == "0" ? "00" : record.minutes
+      }</div>
+        <div class="hoursDetailEdit"><i class="fa-solid fa-pen-to-square"></i></div>
+      </div>`;
+    });
+    $("#hoursModalRecords").innerHTML = htmlString;
+    $("#calendarShadow").classList.remove("hidden");
+    $("#hoursModal").classList.remove("hidden");
   });
 }
 

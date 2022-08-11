@@ -28,11 +28,11 @@ block content
       #periodLegendTitle
       #legendList
     #calendarShadow.hidden(onclick="closeModals()")
-    #yearModal.hidden 
+    #yearModal.calendarModal.hidden 
       #yearModalTitle Input Year
       input(type="number" max="3000" min="2000")
       button(type="submit" onclick="setYear()") Go
-    #monthModal.hidden
+    #monthModal.calendarModal.hidden
       .monthModalOption.clickable(onclick="setMonth(1)") Jan 
       .monthModalOption.clickable(onclick="setMonth(2)") Feb 
       .monthModalOption.clickable(onclick="setMonth(3)") Mar 
@@ -45,6 +45,9 @@ block content
       .monthModalOption.clickable(onclick="setMonth(10)") Oct 
       .monthModalOption.clickable(onclick="setMonth(11)") Nov
       .monthModalOption.clickable(onclick="setMonth(12)") Dec
+    #hoursModal.calendarModal.hidden
+      #hoursDetailDate
+      #hoursModalRecords
   #footer
     i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
     i#homeButton.fa-solid.fa-house(onclick="window.location='/'")
