@@ -81,7 +81,7 @@ passport.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
+/*
 //Use HTTPS if appropriate
 app.get("*", async function (req, res, next) {
   if (req.headers.host.indexOf(":3000") == -1 && !req.secure) {
@@ -90,7 +90,7 @@ app.get("*", async function (req, res, next) {
     next();
   }
 });
-
+*/
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
@@ -107,7 +107,6 @@ app.use((req, res, next) => {
   //What function is called upon window load that could populate the username?
   if (req.user) {
     res.locals.user = req.user;
-    const theUser = res.locals.user;
   }
   next();
 });

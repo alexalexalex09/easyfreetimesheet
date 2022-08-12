@@ -50,4 +50,6 @@ block content
   #footer
     i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
     i#homeButton.fa-solid.fa-house(onclick="window.location='/'")
+    if user
+      i#historyButton.fa-solid.fa-clock-rotate-left(onclick="window.location='/hours'")
   include menu

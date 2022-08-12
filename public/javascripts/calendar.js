@@ -387,11 +387,19 @@ function editRecord(_id) {
       var date = DateTime.fromISO(record.date, { zone: "utc" }).toFormat(
         "yyyy-MM-dd"
       );
+      var hoursOptions = ``;
+      for (var i = 0; i <= 24; i++) {
+        hoursOptions += `<option value=${i}>${i}</option>`;
+      }
+      var minuteOptions = ``;
+      for (var i = 0; i <= 45; i = i + 15) {
+        minuteOptions += `<option value=${i}>${i}</option>`;
+      }
       var htmlString = `
         <div id="editRecord">
           <input type="date" id="editDate" min="0" value="${date}">
-          <input type="number" id="editHours" value="${record.hours}">
-          <input type="number" id="editMinutes" step="15" min="0" value="${record.minutes}">
+          <select name="editHours" id="editHours">${hoursOptions}</select>
+          <select name="editMinutes" id="editMinutes">${minuteOptions}</select>
           <label class="numberLabel" for="editHours">Hours</label>
           <label class="numberLabel" for="editMinutes">Minutes</label>
           <label class="selectLabel" for="editHoursType">Type of Hours:</label>
@@ -410,6 +418,8 @@ function editRecord(_id) {
         $("#editHoursType").value = record.type;
         if ($("#editOrg") !== null) {
           $("#editOrg").value = record.organization.code;
+          $("#editHours").value = record.hours;
+          $("#editMinutes").value = record.minutes;
         }
       });
     });

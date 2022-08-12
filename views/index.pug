@@ -15,11 +15,18 @@ block content
     #time
       #hours 
         button#hoursPlus(onclick="changeInput('#hoursInput', 1)") +1
-        input#hoursInput(type="number" value="0" min="0")
+        select#hoursInput(name="hoursInput")
+          - var i = 0
+          while i < 25
+            option(value=i)= i++
         button#hoursMinus(onclick="changeInput('#hoursInput', -1)") -1
       #minutes
         button#minutesPlus(onclick="changeInput('#minutesInput', 15)") +15
-        input#minutesInput(type="number" step="15" value="0" min="0")
+        select#minutesInput(name="minutesInput")
+          option(value=0) 0
+          option(value=15) 15
+          option(value=30) 30
+          option(value=45) 45
         button#minutesMinus(onclick="changeInput('#minutesInput', -15)") -15
     #timeLabels
       label(for="hoursInput") Hours 

@@ -172,15 +172,19 @@ div {
   padding: 0px 15px;
 }
 
-#time div input, #time div button {
+#time div select, #time div button {
   align-self: center;
 }
 
-#time div input {
+#time div select {
   width: 5rem;
   font-size: 3rem;
   text-align: center;  
   font-family: "Quicksand", sans-serif;
+}
+
+#time div select option {
+  font-size: 1rem;
 }
 
 #timeLabels {
@@ -654,7 +658,7 @@ div#login {
 }
 
 #editHours, #editMinutes {
-  width: 2rem;
+  width: 3rem;
   text-align: center;
   font-size: 1rem;
   align-self: end;

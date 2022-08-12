@@ -38,15 +38,16 @@ function showTimePicker() {
 }
 
 function changeInput(element, amount) {
+  if (
+    parseInt($(element).value) + amount >= 0 &&
+    parseInt($(element).value) + amount <= $(element).lastChild.value
+  ) {
+    $(element).value = parseInt($(element).value) + amount;
+  }
+
   console.log(element);
   console.log($(element).value);
   console.log(amount);
-  $(element).value = parseInt($(element).value) + amount;
-  if ($(element).getAttribute("min")) {
-    if ($(element).value < $(element).getAttribute("min")) {
-      $(element).value = $(element).getAttribute("min");
-    }
-  }
 }
 
 function submitHours() {
