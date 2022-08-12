@@ -354,12 +354,11 @@ function showHoursDetail(isoDate) {
     ).innerHTML = `<div class="hoursDetailDate">${date.toLocaleString()}</div>`;
     var htmlString = ``;
     hoursRecord.forEach(function (record, index) {
-      console.log({ record });
       var hours = record.hours + ":";
       hours += record.minutes == "0" ? "00" : record.minutes;
       hours += " " + record.type;
       htmlString += `
-      <div class="hoursDetailRecord clickable" onclick="editRecord('${hoursIndices[index]}')">
+      <div class="hoursDetailRecord clickable" onclick="editRecord('${record._id}')">
         <div class="hoursDetailHours">${hours}</div>
         <div class="hoursDetailEdit"><i class="fa-solid fa-pen-to-square"></i></div>
       </div>`;
@@ -370,151 +369,88 @@ function showHoursDetail(isoDate) {
   });
 }
 
-const legendColors = [
-  "Red",
-  "GoldenRod",
-  "Aqua",
-  "Aquamarine",
-  "Azure",
-  "Beige",
-  "Bisque",
-  "Black",
-  "BlanchedAlmond",
-  "Blue",
-  "BlueViolet",
-  "Brown",
-  "BurlyWood",
-  "CadetBlue",
-  "Chartreuse",
-  "Chocolate",
-  "Coral",
-  "CornflowerBlue",
-  "Cornsilk",
-  "Crimson",
-  "Cyan",
-  "DarkBlue",
-  "DarkCyan",
-  "DarkGoldenRod",
-  "DarkGray",
-  "DarkGrey",
-  "DarkGreen",
-  "DarkKhaki",
-  "DarkMagenta",
-  "DarkOliveGreen",
-  "DarkOrange",
-  "DarkOrchid",
-  "DarkRed",
-  "DarkSalmon",
-  "DarkSeaGreen",
-  "DarkSlateBlue",
-  "DarkSlateGray",
-  "DarkSlateGrey",
-  "DarkTurquoise",
-  "DarkViolet",
-  "DeepPink",
-  "DeepSkyBlue",
-  "DimGray",
-  "DimGrey",
-  "DodgerBlue",
-  "FireBrick",
-  "FloralWhite",
-  "ForestGreen",
-  "Fuchsia",
-  "Gainsboro",
-  "GhostWhite",
-  "Gold",
-  "Gray",
-  "Grey",
-  "Green",
-  "GreenYellow",
-  "HoneyDew",
-  "HotPink",
-  "IndianRed",
-  "Indigo",
-  "Ivory",
-  "Khaki",
-  "Lavender",
-  "LavenderBlush",
-  "LawnGreen",
-  "LemonChiffon",
-  "LightBlue",
-  "LightCoral",
-  "LightCyan",
-  "LightGoldenRodYellow",
-  "LightGray",
-  "LightGrey",
-  "LightGreen",
-  "LightPink",
-  "LightSalmon",
-  "LightSeaGreen",
-  "LightSkyBlue",
-  "LightSlateGray",
-  "LightSlateGrey",
-  "LightSteelBlue",
-  "LightYellow",
-  "Lime",
-  "LimeGreen",
-  "Linen",
-  "Magenta",
-  "Maroon",
-  "MediumAquaMarine",
-  "MediumBlue",
-  "MediumOrchid",
-  "MediumPurple",
-  "MediumSeaGreen",
-  "MediumSlateBlue",
-  "MediumSpringGreen",
-  "MediumTurquoise",
-  "MediumVioletRed",
-  "MidnightBlue",
-  "MintCream",
-  "MistyRose",
-  "Moccasin",
-  "NavajoWhite",
-  "Navy",
-  "OldLace",
-  "Olive",
-  "OliveDrab",
-  "Orange",
-  "OrangeRed",
-  "Orchid",
-  "PaleGoldenRod",
-  "PaleGreen",
-  "PaleTurquoise",
-  "PaleVioletRed",
-  "PapayaWhip",
-  "PeachPuff",
-  "Peru",
-  "Pink",
-  "Plum",
-  "PowderBlue",
-  "Purple",
-  "RebeccaPurple",
-  "RosyBrown",
-  "RoyalBlue",
-  "SaddleBrown",
-  "Salmon",
-  "SandyBrown",
-  "SeaGreen",
-  "SeaShell",
-  "Sienna",
-  "Silver",
-  "SkyBlue",
-  "SlateBlue",
-  "SlateGray",
-  "SlateGrey",
-  "Snow",
-  "SpringGreen",
-  "SteelBlue",
-  "Tan",
-  "Teal",
-  "Thistle",
-  "Tomato",
-  "Turquoise",
-  "Violet",
-  "Wheat",
-  "White",
-  "WhiteSmoke",
-  "Yellow",
-  "YellowGreen",
-];
+function editRecord(_id) {
+  localforage.getItem("hours").then(function (hours) {
+    localforage.getItem("organizations").then(function (organizations) {
+      const record = hours.find(function (v) {
+        return v._id == _id;
+      });
+      var orgSelector = "";
+      if (organizations.length > 1) {
+        orgSelector = `<label class="selectLabel" for="editOrg">Organization:</label>
+                       <select class="selector" id="editOrg">`;
+        organizations.forEach(function (org) {
+          orgSelector += `<option value="${org.code}">${org.name}</option>`;
+        });
+        orgSelector += `</select>`;
+      }
+      var date = DateTime.fromISO(record.date, { zone: "utc" }).toFormat(
+        "yyyy-MM-dd"
+      );
+      var htmlString = `
+        <div id="editRecord">
+          <input type="date" id="editDate" min="0" value="${date}">
+          <input type="number" id="editHours" value="${record.hours}">
+          <input type="number" id="editMinutes" step="15" min="0" value="${record.minutes}">
+          <label class="numberLabel" for="editHours">Hours</label>
+          <label class="numberLabel" for="editMinutes">Minutes</label>
+          <label class="selectLabel" for="editHoursType">Type of Hours:</label>
+          <select class="selector" id="editHoursType">
+            <option value="worked">Worked</option>
+            <option value="vacation">Vacation</option>
+          </select>
+          ${orgSelector}
+          <button id="editDelete" onclick="deleteRecord('${record._id}')">Delete?</button>
+          <button id="editCancel" onclick="deleteRecord(closeModals())">Cancel</button>
+          <button id="editSubmit" onclick="submitRecordEdit('${record._id}')">Submit</button>
+        </div>
+        `;
+      $("#hoursModalRecords").innerHTML = htmlString;
+      setTimeout(function () {
+        $("#editHoursType").value = record.type;
+        if ($("#editOrg") !== null) {
+          $("#editOrg").value = record.organization.code;
+        }
+      });
+    });
+  });
+}
+
+function deleteRecord(_id) {
+  $("#editDelete").innerHTML = "Click to confirm deletion";
+  $("#editDelete").setAttribute("onclick", `confirmDelete('${_id}')`);
+}
+
+function confirmDelete(_id) {
+  efsFetch("/api/deleteRecord", { _id: _id }, function (res) {
+    if (res.hours) {
+      localforage.setItem("hours", res.hours).then(function () {
+        showHours();
+        closeModals();
+      });
+    }
+  });
+}
+
+function submitRecordEdit(_id) {
+  var org = "";
+  if ($("#editOrg") !== null) {
+    org = $("#editOrg").value;
+  }
+  const body = {
+    _id: _id,
+    hours: $("#editHours").value,
+    minutes: $("#editMinutes").value,
+    type: $("#editHoursType").value,
+    organization: org,
+    date: $("#editDate").value,
+  };
+  efsFetch("/api/editRecord", body, function (res) {
+    if (res.hours) {
+      localforage.setItem("hours", res.hours).then(function () {
+        showHours();
+        closeModals();
+      });
+    }
+  });
+}

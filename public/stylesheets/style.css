@@ -23,6 +23,10 @@ input[type=time]::-webkit-datetime-edit-ampm-field {
   display: none;
 }
 
+input[type=number]::-webkit-inner-spin-button {
+  opacity: 1
+}
+
 button {
   background-color: #fffc;
   border: none;
@@ -627,9 +631,61 @@ div#login {
 }
 
 #hoursModalRecords {
-  max-height: 20rem;
+  max-height: 25rem;
   overflow-y: auto;
 }
+
+#editRecord {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(6, 2rem);
+  grid-row-gap: 1rem;
+  justify-items: center;
+  font-size: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+#editDate {
+  grid-area: 1/1/2/3;
+  font-family: "Quicksand", serif;
+  max-width: min-content;
+  font-size: 1.2rem;
+}
+
+#editHours, #editMinutes {
+  width: 2rem;
+  text-align: center;
+  font-size: 1rem;
+  align-self: end;
+}
+
+#editRecord .numberLabel {
+  align-self: start;
+  font-size: 1.5rem;
+  margin-top: -1rem;
+}
+
+#editRecord .selectLabel {
+  font-size: 1.2rem;
+  justify-self: end;
+  margin-right: 0.5rem;
+}
+
+#editRecord .selector {
+  font-size: 1.5rem;
+  justify-self: start;
+  margin-left: 0.5rem;
+}
+
+#editDelete {
+  grid-area: 6/1/7/3;
+}
+
+
+
+
+
 
 
 

@@ -303,4 +303,84 @@ router.post(
   })
 );
 
+router.post(
+  "/deleteRecord",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    Hours.findByIdAndDelete(req.body._id)
+      .exec()
+      .then(function (theHours, err) {
+        if (err) {
+          res.send({ err });
+        } else {
+          Hours.find({ user_profile_id: req.user.id }, "-user -user_profile_id")
+            .populate("organization", "code name")
+            .exec()
+            .then(function (theHours) {
+              res.send({ hours: theHours });
+            });
+        }
+      });
+  })
+);
+
+router.post(
+  "/editRecord",
+  [
+    body("date").isDate(),
+    body("hours").isNumeric(),
+    body("minutes").isNumeric(),
+    body("type").not().isEmpty().trim().escape().stripLow(),
+  ],
+  ash(async function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.send({ err: errors.array()[0] });
+      return;
+    } else {
+      if (req.body.hours == 0 && req.body.minutes == 0) {
+        res.send({ err: "No time recorded!" });
+      }
+      if (!req.user) {
+        res.send(ERR_LOGIN);
+      }
+      var curHours = await Hours.findById(req.body._id)
+        .populate("organization", "code")
+        .exec();
+      var dt = DateTime.fromISO(req.body.date);
+      dt = dt.setZone("utc", { keepLocalTime: true });
+      var curOrganization = curHours.Organization;
+      if (typeof req.body.organization != "undefined") {
+        curOrganization = await Organization.findOne({
+          code: req.body.organization,
+        });
+        curOrganization = curOrganization._id;
+      }
+      const curUser = await User.findOne({ profile_id: req.user.id });
+      curHours.hours = req.body.hours;
+      curHours.minutes = req.body.minutes;
+      curHours.type = req.body.type;
+      curHours.organization = curOrganization;
+      curHours.user = curUser._id;
+      curHours.user_profile_id = curUser.profile_id;
+      curHours.date = dt;
+      curHours.save().then(function (curHours, err) {
+        if (err) {
+          res.send({ err: err });
+        } else {
+          Hours.find({ user_profile_id: req.user.id }, "-user -user_profile_id")
+            .populate("organization", "code name")
+            .exec()
+            .then(function (theHours) {
+              res.send({ hours: theHours });
+            });
+        }
+      });
+    }
+  })
+);
+
 module.exports = router;

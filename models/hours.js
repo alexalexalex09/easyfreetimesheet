@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 //Create schema
 var HoursSchema = new Schema(
   {
-    hours: String,
+    hours: Number,
     minutes: Number,
     type: String,
     user: { type: Schema.Types.ObjectId, ref: "User" },
