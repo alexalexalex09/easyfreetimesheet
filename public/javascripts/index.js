@@ -21,6 +21,9 @@ window.addEventListener("load", function () {
   });
 
   localforage.getItem("organizations").then(function (orgs) {
+    if (!orgs) {
+      return;
+    }
     if (orgs.length > 1) {
       orgs.forEach(function (org) {
         var el = document.createElement("option");
