@@ -47,12 +47,6 @@ if (app.get("env") === "production") {
 }
 app.use(session(sess));
 
-User.findOne({})
-  .exec()
-  .then(function (curUser) {
-    console.log({ curUser });
-  });
-
 //Auth
 passport.serializeUser(function (user, done) {
   done(null, user);
