@@ -4,9 +4,11 @@ block scripts
   script(type="text/javascript" src="/javascripts/hours.js")
 
 block content
-  #hoursContainer.mainContainer
-    #hoursTitle.pageTitle Hours 
-    #hours
+  #periodsContainer.mainContainer
+    #periodsTitle.pageTitle Pay Periods to approve: 
+    #periodSelector
+      select#periodsOrg.hidden.selector
+    #periods
   #footer
     i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
     i#homeButton.fa-solid.fa-house(onclick="window.location='/'")

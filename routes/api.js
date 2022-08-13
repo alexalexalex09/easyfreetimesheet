@@ -304,6 +304,32 @@ router.post(
 );
 
 router.post(
+  "/getUnapprovedPeriods",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    const curUser = await User.findOne({ profile_id: req.user.id })
+      .populate("organizations", "code name")
+      .exec();
+    const curPeriods = await PayPeriod.find({
+      $and: [
+        { owner: { $in: curUser.organizations } },
+        { _id: { $not: { $in: curUser.approvedPayPeriods } } },
+      ],
+    })
+      .populate("owner", "name code")
+      .exec();
+    const curHours = await Hours.find({
+      user_profile_id: req.user.id,
+    }).populate("organization", "name code");
+    const curOrgs = curUser.organizations;
+    res.send({ hours: curHours, periods: curPeriods, orgs: curOrgs });
+  })
+);
+
+router.post(
   "/deleteRecord",
   ash(async function (req, res, next) {
     if (!req.user) {
@@ -379,6 +405,31 @@ router.post(
             });
         }
       });
+    }
+  })
+);
+
+router.post(
+  "/approvePeriod",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    if (!req.body._id) {
+      res.send({ err: "Empty Pay Period" });
+    }
+    var curUser = await User.findOne({ profile_id: req.user.id });
+    const index = curUser.approvedPayPeriods.findIndex(function (v) {
+      v == req.body._id;
+    });
+    if (index == -1) {
+      curUser.approvedPayPeriods.push(req.body._id);
+      curUser.save().then(function (result) {
+        res.send(result);
+      });
+    } else {
+      res.send({ err: "Already approved" });
     }
   })
 );

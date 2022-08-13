@@ -15,35 +15,43 @@ window.addEventListener("load", function () {
   };
 });
 
-function efsFetch(req, body, handler, errorHandler) {
-  if (body === "") {
-    body = {};
-  }
-  const efs_options = {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
-  fetch(req, efs_options).then(function (response) {
-    return response.json().then((res) => {
-      if (res.err) {
-        if (errorHandler) {
-          errorHandler(res);
-        } else {
-          if (typeof res.err == "object") {
-            createAndShowAlert(res.err.msg + ": " + res.err.param);
+async function efsFetch(req, body, handler, errorHandler) {
+  var promise = new Promise(function (resolve, reject) {
+    if (body === "") {
+      body = {};
+    }
+    const efs_options = {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    fetch(req, efs_options).then(function (response) {
+      return response.json().then((res) => {
+        if (res.err) {
+          if (errorHandler) {
+            errorHandler(res);
+            reject(res);
           } else {
-            createAndShowAlert(res.err);
+            if (typeof res.err == "object") {
+              createAndShowAlert(res.err.msg + ": " + res.err.param);
+              reject(res.err.msg + ": " + res.err.param);
+            } else {
+              createAndShowAlert(res.err);
+              reject(res.err);
+            }
           }
+        } else {
+          if (handler) {
+            handler(res);
+          }
+          resolve(res);
         }
-      } else {
-        handler(res);
-      }
+      });
     });
   });
-  return;
+  return promise;
 }
 
 function createAndShowAlert(err) {
@@ -74,4 +82,32 @@ function changeInput(element, amount) {
       $(element).value = $(element).getAttribute("min");
     }
   }
+}
+
+function storePayPeriods(payPeriods) {
+  var promise = new Promise(function (resolve, reject) {
+    let storage = [];
+    payPeriods.forEach(function (v) {
+      const periodStart = DateTime.fromISO(v.start, { zone: "utc" });
+      const periodEnd = DateTime.fromISO(v.end, { zone: "utc" });
+      storage.push({
+        periodStart: {
+          day: periodStart.day,
+          month: periodStart.month,
+          year: periodStart.year,
+          owner: v.owner,
+        },
+        periodEnd: {
+          day: periodEnd.day,
+          month: periodEnd.month,
+          year: periodEnd.year,
+          owner: v.owner,
+        },
+      });
+    });
+    localforage.setItem("payPeriods", storage).then(function (res) {
+      resolve(storage);
+    });
+  });
+  return promise;
 }

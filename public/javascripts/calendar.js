@@ -141,34 +141,6 @@ function setCalendar(luxonDateTime) {
   showHours();
 }
 
-function storePayPeriods(payPeriods) {
-  var promise = new Promise(function (resolve, reject) {
-    let storage = [];
-    payPeriods.forEach(function (v) {
-      const periodStart = DateTime.fromISO(v.start, { zone: "utc" });
-      const periodEnd = DateTime.fromISO(v.end, { zone: "utc" });
-      storage.push({
-        periodStart: {
-          day: periodStart.day,
-          month: periodStart.month,
-          year: periodStart.year,
-          owner: v.owner,
-        },
-        periodEnd: {
-          day: periodEnd.day,
-          month: periodEnd.month,
-          year: periodEnd.year,
-          owner: v.owner,
-        },
-      });
-    });
-    localforage.setItem("payPeriods", storage).then(function (res) {
-      resolve(storage);
-    });
-  });
-  return promise;
-}
-
 function showPayPeriods(owner) {
   localforage.getItem("payPeriods").then(function (payPeriods) {
     if (typeof payPeriods == "undefined") {
