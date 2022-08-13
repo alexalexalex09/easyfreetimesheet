@@ -19,9 +19,13 @@ router.get(
   }),
   function (req, res) {
     console.log("received callback from google:");
-    var user = req.user;
-    console.log({ user });
     req.logIn(req.user, function (err) {
+      var user = req.user;
+      console.log({ user });
+      if (err) {
+        console.log("************");
+        console.error({ err });
+      }
       res.redirect(process.env.CLIENT_URL + "/");
     });
   }

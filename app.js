@@ -102,9 +102,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  //Get username from Mongo and pass into locals
-  //Would it be better to send this from somewhere else?
-  //What function is called upon window load that could populate the username?
+  console.log("App is using:");
+  var user = req.user;
+  console.log({ user });
   if (req.user) {
     res.locals.user = req.user;
   }
