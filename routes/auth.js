@@ -18,6 +18,9 @@ router.get(
     session: false,
   }),
   function (req, res) {
+    console.log("received callback from google:");
+    var user = req.user;
+    console.log({ user });
     req.logIn(req.user, function (err) {
       res.redirect(process.env.CLIENT_URL + "/");
     });
