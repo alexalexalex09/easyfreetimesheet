@@ -103,9 +103,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  console.log("App is using:");
-  var user = req.user;
-  console.log({ user });
   if (req.user) {
     res.locals.user = req.user;
   }

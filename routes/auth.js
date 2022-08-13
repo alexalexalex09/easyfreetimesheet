@@ -18,10 +18,7 @@ router.get(
     session: false,
   }),
   function (req, res) {
-    console.log("received callback from google:");
     req.logIn(req.user, function (err) {
-      var user = req.user;
-      console.log({ user });
       if (err) {
         console.log("************");
         console.error({ err });
