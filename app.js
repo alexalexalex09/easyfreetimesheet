@@ -38,7 +38,8 @@ var sess = {
 };
 if (app.get("env") === "production") {
   // Use secure cookies in production (requires SSL/TLS)
-  //sess.cookie.secure = true;
+  // can't use if only cloudflare is secure
+  // sess.cookie.secure = true;
 
   // Uncomment the line below if your application is behind a proxy (like on Heroku)
   // or if you're encountering the error message:
