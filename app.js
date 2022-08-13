@@ -47,7 +47,7 @@ if (app.get("env") === "production") {
 }
 app.use(session(sess));
 
-User.findOne("")
+User.findOne({})
   .exec()
   .then(function (curUser) {
     console.log({ curUser });
