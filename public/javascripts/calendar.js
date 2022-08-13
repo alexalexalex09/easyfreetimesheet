@@ -285,7 +285,7 @@ function getDayHours(hoursRecords, d) {
   var minutes = 0;
   hoursRecords = hoursRecords.filter(function (v) {
     vDate = DateTime.fromISO(v.date, { zone: "utc", keepLocalTime: true });
-    return vDate.month == d.month && vDate.day == d.day;
+    return vDate.month == d.month && vDate.day == d.day && vDate.year == d.year;
   });
 
   hoursRecords.forEach(function (v) {
