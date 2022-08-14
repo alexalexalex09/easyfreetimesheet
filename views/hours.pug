@@ -5,10 +5,13 @@ block scripts
 
 block content
   #periodsContainer.mainContainer
-    #periodsTitle.pageTitle Pay Periods to approve: 
+    #periodsTitle.pageTitle Pay Periods: 
+    #periodTypeSelector 
+      select#periodsType.hidden.selector
     #periodSelector
       select#periodsOrg.hidden.selector
     #periods
+    #calendarShadow.hidden(onclick="closeModals()")
   #footer
     i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
     i#homeButton.fa-solid.fa-house(onclick="window.location='/'")

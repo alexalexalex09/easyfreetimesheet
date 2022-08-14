@@ -462,6 +462,11 @@ div#login {
   width: 100%;
 }
 
+.displayHoursDetail {
+  width: 18rem;
+  font-size: 1.5rem;
+}
+
 .editHours, .deleteHours {
   justify-self: end;
 }

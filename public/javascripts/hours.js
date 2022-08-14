@@ -70,16 +70,10 @@ function showPeriodsList(hours, periods, orgs) {
     const startDate = start.toLocaleString();
     const end = DateTime.fromISO(period.end, { zone: "utc" });
     const endDate = end.toLocaleString();
-    console.log("**");
-    console.log(
-      start.month + "/" + start.day + "-" + end.month + "/" + end.day
-    );
     var periodHoursList = hoursList.filter(function (v) {
       const dt = DateTime.fromISO(v.date, { zone: "utc" });
-      console.log(dt.month + "/" + dt.day + (start <= dt && end >= dt));
       return start <= dt && end >= dt;
     });
-    console.log("--");
     hoursTotal = 0;
     minutesTotal = 0;
     periodHoursList.forEach(function (v) {
@@ -90,18 +84,23 @@ function showPeriodsList(hours, periods, orgs) {
     minutesTotal = minutesTotal % 60;
     minutesTotal = minutesTotal == 0 ? "00" : minutesTotal;
     htmlString += `
-      <div class="displayPeriod">
+      <div class="displayPeriod" id="period${period._id}">
         <div class="displayPeriodDates">${startDate.slice(
           0,
           -5
         )} - ${endDate.slice(0, -5)}</div>
         <div class="displayPeriodHours">${hoursTotal}:${minutesTotal}</div>
-        <button class="viewPeriodDetail" onclick="viewPeriodDetail('${
-          period._id
-        }')"><i class="fa-solid fa-pen-to-square"></i></button>
-        <button class="approvePeriod" onclick="approvePeriod('${
-          period._id
-        }')">Approve</button>
+        <div class="displayHoursDetail calendarModal hidden">`;
+    periodHoursList.forEach(function (v) {
+      htmlString += `
+          <div class="displayDetailHours">${v.hours}:${
+        v.minutes == 0 ? "00" : v.minutes
+      }</div>
+          `;
+    });
+    htmlString += `</div>
+        <button class="viewPeriodDetail" onclick="viewPeriodDetail('${period._id}')"><i class="fa-solid fa-calendar-week"></i></button>
+        <button class="approvePeriod" onclick="approvePeriod('${period._id}')">Approve</button>
       </div>
       `;
   });
@@ -113,4 +112,17 @@ function approvePeriod(_id) {
     const { hours, periods, orgs } = await getNewUnapprovedPeriods();
     showPeriodsList(hours, periods, orgs);
   });
+}
+
+function viewPeriodDetail(_id) {
+  $("#period" + _id + " .displayHoursDetail").classList.remove("hidden");
+  $("#calendarShadow").classList.remove("hidden");
+  console.log("Nothing yet");
+}
+
+function closeModals() {
+  $$(".calendarModal").forEach(function (el) {
+    el.classList.add("hidden");
+  });
+  $("#calendarShadow").classList.add("hidden");
 }
