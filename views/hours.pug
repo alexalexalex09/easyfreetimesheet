@@ -6,10 +6,15 @@ block scripts
 block content
   #periodsContainer.mainContainer
     #periodsTitle.pageTitle Pay Periods: 
-    #periodTypeSelector 
-      select#periodsType.hidden.selector
-    #periodSelector
-      select#periodsOrg.hidden.selector
+    #periodsTypeContainer 
+      label#changePeriodTypeLabel(for="changePeriodType") Viewing: 
+      select#changePeriodType.selector(onchange="changeDisplayPeriods()")
+        option(value="unapproved") Unapproved Pay Periods
+        option(value="revokable") Revokable Pay Periods
+        option(value="approved") Approved Pay Periods
+    #periodsSelector.hidden
+      label#periodsOrgLabel(for="periodsOrg") Organization: 
+      select#periodsOrg.selector
     #periods
     #calendarShadow.hidden(onclick="closeModals()")
   #footer

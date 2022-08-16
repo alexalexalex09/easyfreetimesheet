@@ -7,11 +7,9 @@ var OrganizationSchema = new Schema(
   {
     name: String,
     owners: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    approvers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     code: String,
-    approvedPayPeriods: {
-      users: [{ type: Schema.Types.ObjectId, ref: "User" }],
-      payPeriods: [{ start: Date, end: Date }],
-    },
+    payPeriods: [{ type: Schema.Types.ObjectId, ref: "PayPeriod" }],
   },
   { collection: "organizations" }
 );

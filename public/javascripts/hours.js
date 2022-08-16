@@ -11,41 +11,74 @@ window.addEventListener("load", function () {
 });
 
 async function periodsListInit() {
-  const { hours, periods, orgs } = await getNewUnapprovedPeriods();
+  const Periods = await getPeriodsWithApprovals();
+  const { hours, periods, orgs } = Periods;
   if (orgs.length > 1) {
     orgSelectorInit(hours, periods, orgs);
   }
-  showPeriodsList(hours, periods, orgs);
+  createPeriodsList(Periods);
 }
 
-function orgSelectorInit(hours, periods, orgs) {
+function orgSelectorInit(Periods) {
   var htmlString = "";
   orgs.forEach(function (org) {
     htmlString += `<option value="${org.code}">${org.name}</option>`;
   });
   $("#periodsOrg").innerHTML = htmlString;
-  $("#periodsOrg").classList.remove("hidden");
+  $("#periodsSelector").classList.remove("hidden");
   $("#periodsOrg").addEventListener("change", function (e) {
-    showPeriodsList(hours, periods, orgs);
+    createPeriodsList(Periods);
   });
 }
 
-async function getNewUnapprovedPeriods() {
-  const { hours, periods, orgs } = await efsFetch(
-    "/api/getUnapprovedPeriods",
-    {}
-  );
+async function getPeriodsWithApprovals() {
+  const Periods = await efsFetch("/api/getPeriodsWithApprovals", {});
+  const { hours, orgs, periods } = Periods;
   localforage.setItem("hours", hours);
   localforage.setItem("organizations", orgs);
   storePayPeriods(periods);
-  return { hours: hours, periods: periods, orgs: orgs };
+  return Periods;
 }
 
-function showPeriodsList(hours, periods, orgs) {
-  console.log("showPeriodsList");
+function createPeriodsList(Periods) {
+  var { hours, orgs, unapprovedPeriods, approvedPeriods, revokablePeriods } =
+    Periods;
+  htmlString = ``;
+  htmlString += getPeriodsHtml(
+    unapprovedPeriods,
+    hours,
+    orgs,
+    "unapproved",
+    "Approve"
+  );
+  htmlString += getPeriodsHtml(
+    revokablePeriods,
+    hours,
+    orgs,
+    "revokable",
+    "Revoke",
+    true
+  );
+  htmlString += getPeriodsHtml(
+    approvedPeriods,
+    hours,
+    orgs,
+    "approved",
+    "",
+    true
+  );
+  $("#periods").innerHTML = htmlString;
+}
+
+function getPeriodsHtml(periods, hours, orgs, type, action, hidden = false) {
+  if (periods.length == 0 || hours.length == 0) {
+    return `<div class="${type}${hidden ? " hidden" : ""}"></div>`;
+  }
   htmlString = ``;
   var hoursList = [];
   var periodList = [];
+  console.log({ orgs });
+  console.log(orgs.length);
   if (orgs.length > 1) {
     hoursList = hours.filter(function (v) {
       return v.organization.code == $("#periodsOrg").value;
@@ -58,11 +91,25 @@ function showPeriodsList(hours, periods, orgs) {
     periodList = periods;
   }
   periodList.sort(function (a, b) {
-    return (
-      DateTime.fromISO(a.start, { zone: "utc" }) -
-      DateTime.fromISO(b.start, { zone: "utc" })
-    );
+    switch (type) {
+      case "unapproved":
+        return (
+          DateTime.fromISO(a.start, { zone: "utc" }) -
+          DateTime.fromISO(b.start, { zone: "utc" })
+        );
+        break;
+      case "revokable":
+      case "approved":
+      default:
+        return (
+          DateTime.fromISO(b.start, { zone: "utc" }) -
+          DateTime.fromISO(a.start, { zone: "utc" })
+        );
+        break;
+    }
   });
+  htmlString += `
+  <div class="${type}${hidden ? " hidden" : ""}">`;
   periodList.forEach(function (period) {
     const start = DateTime.fromISO(period.start, {
       zone: "utc",
@@ -83,34 +130,94 @@ function showPeriodsList(hours, periods, orgs) {
     hoursTotal += Math.floor(minutesTotal / 60);
     minutesTotal = minutesTotal % 60;
     minutesTotal = minutesTotal == 0 ? "00" : minutesTotal;
+    const date =
+      startDate.slice(0, -5) + " - " + endDate.slice(0, -4) + endDate.slice(-2);
     htmlString += `
-      <div class="displayPeriod" id="period${period._id}">
-        <div class="displayPeriodDates">${startDate.slice(
-          0,
-          -5
-        )} - ${endDate.slice(0, -5)}</div>
-        <div class="displayPeriodHours">${hoursTotal}:${minutesTotal}</div>
-        <div class="displayHoursDetail calendarModal hidden">`;
-    periodHoursList.forEach(function (v) {
+        <div 
+          class="displayPeriod" 
+          id="period${period._id}">
+          <div class="displayPeriodDates">${date}</div>
+          <div class="displayPeriodHours">${hoursTotal}:${minutesTotal}</div>`;
+    if (periodHoursList.length > 0) {
+      console.log({ periodHoursList });
+      periodHoursList = periodHoursList.sort(function (a, b) {
+        return (
+          DateTime.fromISO(a.date, { zone: "utc" }) -
+          DateTime.fromISO(b.date, { zone: "utc" })
+        );
+      });
       htmlString += `
-          <div class="displayDetailHours">${v.hours}:${
-        v.minutes == 0 ? "00" : v.minutes
-      }</div>
+          <div class="displayHoursDetail calendarModal hidden">
+            <div class="displayHoursDetailTitle">${date}</div>
+            <div class="displayHoursDetailContainer">`;
+      periodHoursList.forEach(function (v) {
+        var minutes = v.minutes == 0 ? "00" : v.minutes;
+        var hoursDate = DateTime.fromISO(v.date, {
+          zone: "utc",
+        }).toLocaleString();
+        hoursDate = hoursDate.slice(0, -5);
+        htmlString += `
+              <div class="displayDetailDate">${hoursDate}</div>
+              <div class="displayDetailHours">${v.hours}:${minutes}</div>
+              <div class="displayPeriodType">${
+                v.type.charAt(0).toUpperCase() + v.type.slice(1)
+              }</div>
+              `;
+      });
+      htmlString += `
+            </div>
+          </div>`;
+    }
+    var viewPeriodDetail = "";
+    var approvePeriod = "";
+    if (periodHoursList.length > 0) {
+      viewPeriodDetail = `viewPeriodDetail('${period._id}')`;
+      switch (type) {
+        case "unapproved":
+          approvePeriod = `approvePeriod('${period._id}')`;
+          break;
+        case "revokable":
+          approvePeriod = `revokePeriod('${period._id}')`;
+          break;
+        case "approved":
+          break;
+      }
+    }
+    htmlString += `
+          <button class="viewPeriodDetail" onclick="${viewPeriodDetail}">
+            <i class="fa-solid fa-calendar-week"></i>
+          </button>
+          <button 
+            class="approvePeriod${type == "approved" ? " hidden" : ""}" 
+            onclick="${approvePeriod}">
+            ${action}
+          </button>
+        </div>
           `;
-    });
-    htmlString += `</div>
-        <button class="viewPeriodDetail" onclick="viewPeriodDetail('${period._id}')"><i class="fa-solid fa-calendar-week"></i></button>
-        <button class="approvePeriod" onclick="approvePeriod('${period._id}')">Approve</button>
-      </div>
-      `;
   });
-  $("#periods").innerHTML = htmlString;
+  htmlString += `</div>`;
+  return htmlString;
+}
+
+function changeDisplayPeriods() {
+  const type = $("#changePeriodType").value;
+  $$("#periods>div").forEach(function (v) {
+    v.classList.add("hidden");
+  });
+  $("#periods ." + type).classList.remove("hidden");
 }
 
 function approvePeriod(_id) {
   efsFetch("/api/approvePeriod", { _id: _id }, async function (res) {
-    const { hours, periods, orgs } = await getNewUnapprovedPeriods();
-    showPeriodsList(hours, periods, orgs);
+    const Periods = await getPeriodsWithApprovals();
+    createPeriodsList(Periods);
+  });
+}
+
+function revokePeriod(_id) {
+  efsFetch("/api/revokePeriod", { _id: _id }, async function (res) {
+    const Periods = await getPeriodsWithApprovals();
+    createPeriodsList(Periods);
   });
 }
 

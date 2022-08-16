@@ -53,7 +53,7 @@ router.post(
     body("hours").isNumeric(),
     body("minutes").isNumeric(),
     body("type").not().isEmpty().trim().escape().stripLow(),
-    body("organization").not().isEmpty().trim().escape().stripLow(),
+    body("organization").trim().escape().stripLow(),
   ],
   ash(async function (req, res, next) {
     const errors = validationResult(req);
@@ -69,10 +69,17 @@ router.post(
       }
       var dt = DateTime.fromISO(req.body.date);
       dt = dt.setZone("utc", { keepLocalTime: true });
-      const curOrganization = await Organization.findOne({
-        code: req.body.organization,
-      });
       const curUser = await User.findOne({ profile_id: req.user.id });
+      var curOrganization = {};
+      if (req.body.organization == "") {
+        curOrganization = await Organization.findById(
+          curUser.organizations[0]._id
+        );
+      } else {
+        curOrganization = await Organization.findOne({
+          code: req.body.organization,
+        });
+      }
       const newHours = new Hours({
         hours: req.body.hours,
         minutes: req.body.minutes,
@@ -141,7 +148,8 @@ function defaultPayPeriods(owner) {
     var payPeriodsArray = [];
     var dt = DateTime.now();
     const year = dt.year;
-    for (var i = 1; i <= 12; i++) {
+    const month = dt.month;
+    for (var i = month; i <= 12; i++) {
       var start = DateTime.fromObject(
         {
           year: year,
@@ -163,7 +171,15 @@ function defaultPayPeriods(owner) {
       console.log({ start });
       end = new Date(end.toISO());
       payPeriodsArray.push({
-        insertOne: { document: { owner: owner, start: start, end: end } },
+        insertOne: {
+          document: {
+            owner: owner,
+            start: start,
+            end: end,
+            approvedBy: [],
+            fullyApproved: false,
+          },
+        },
       });
       start = DateTime.fromObject(
         {
@@ -177,7 +193,15 @@ function defaultPayPeriods(owner) {
       start = new Date(start.toISO());
       end = new Date(end.toISO());
       payPeriodsArray.push({
-        insertOne: { document: { owner: owner, start: start, end: end } },
+        insertOne: {
+          document: {
+            owner: owner,
+            start: start,
+            end: end,
+            approvedBy: [],
+            fullyApproved: false,
+          },
+        },
       });
     }
     PayPeriod.bulkWrite(payPeriodsArray).then(
@@ -215,16 +239,14 @@ router.post(
         const newOrg = new Organization({
           name: req.body.name,
           owners: [curUser._id],
+          approvers: [curUser._id],
           code: theCode,
-          approvedPayPeriods: {
-            users: [],
-            payPeriods: [],
-          },
+          payPeriods: [],
         });
         var theOrg = await newOrg.save();
         var payPeriods = await defaultPayPeriods(theOrg);
         payPeriods = Object.values(payPeriods);
-        theOrg.approvedPayPeriods.payPeriods = payPeriods;
+        theOrg.payPeriods = payPeriods;
         var err = await theOrg.save();
         const orgs = await Organization.find({
           owner: curUser._id,
@@ -304,7 +326,7 @@ router.post(
 );
 
 router.post(
-  "/getUnapprovedPeriods",
+  "/getPeriodsWithApprovals",
   ash(async function (req, res, next) {
     if (!req.user) {
       res.send(ERR_LOGIN);
@@ -313,7 +335,10 @@ router.post(
     const curUser = await User.findOne({ profile_id: req.user.id })
       .populate("organizations", "code name")
       .exec();
-    const curPeriods = await PayPeriod.find({
+    const periods = await PayPeriod.find({
+      owner: { $in: curUser.organizations },
+    });
+    const unapprovedPeriods = await PayPeriod.find({
       $and: [
         { owner: { $in: curUser.organizations } },
         { _id: { $not: { $in: curUser.approvedPayPeriods } } },
@@ -321,11 +346,37 @@ router.post(
     })
       .populate("owner", "name code")
       .exec();
+    var userApprovedPeriods = await PayPeriod.find({
+      $and: [
+        { owner: { $in: curUser.organizations } },
+        { _id: { $in: curUser.approvedPayPeriods } },
+      ],
+    })
+      .populate("owner", "name code")
+      .exec();
+    var revokablePeriods = [];
+    var approvedPeriods = [];
+
+    //For each period in the user's approved periods list
+    userApprovedPeriods.forEach(function (period) {
+      if (period.fullyApproved) {
+        approvedPeriods.push(period);
+      } else {
+        revokablePeriods.push(period);
+      }
+    });
     const curHours = await Hours.find({
       user_profile_id: req.user.id,
     }).populate("organization", "name code");
     const curOrgs = curUser.organizations;
-    res.send({ hours: curHours, periods: curPeriods, orgs: curOrgs });
+    res.send({
+      hours: curHours,
+      orgs: curOrgs,
+      periods: periods,
+      unapprovedPeriods: unapprovedPeriods,
+      approvedPeriods: approvedPeriods,
+      revokablePeriods: revokablePeriods,
+    });
   })
 );
 
@@ -425,6 +476,31 @@ router.post(
     });
     if (index == -1) {
       curUser.approvedPayPeriods.push(req.body._id);
+      curUser.save().then(function (result) {
+        res.send(result);
+      });
+    } else {
+      res.send({ err: "Already approved" });
+    }
+  })
+);
+
+router.post(
+  "/revokePeriod",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    if (!req.body._id) {
+      res.send({ err: "Empty Pay Period" });
+    }
+    var curUser = await User.findOne({ profile_id: req.user.id });
+    const index = curUser.approvedPayPeriods.findIndex(function (v) {
+      v == req.body._id;
+    });
+    if (index != -1) {
+      curUser.approvedPayPeriods.splice(index, 1);
       curUser.save().then(function (result) {
         res.send(result);
       });

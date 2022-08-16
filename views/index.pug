@@ -5,41 +5,42 @@ block scripts
 
 block content
   #indexContainer.mainContainer
-    #hoursPrompt.pageTitle Enter your hours
-    #date
-      button#yesterday(onclick="document.querySelector('#dateInput').stepDown()")
-        i.rightArrow.fa-solid.fa-arrow-left-long
-      input#dateInput(type="date")
-      button#tomorrow(onclick="document.querySelector('#dateInput').stepUp()")
-        i.rightArrow.fa-solid.fa-arrow-right-long
-    #time
-      #hours 
-        button#hoursPlus(onclick="changeInput('#hoursInput', 1)") +1
-        select#hoursInput(name="hoursInput")
-          - var i = 0
-          while i < 25
-            option(value=i)= i++
-        button#hoursMinus(onclick="changeInput('#hoursInput', -1)") -1
-      #minutes
-        button#minutesPlus(onclick="changeInput('#minutesInput', 15)") +15
-        select#minutesInput(name="minutesInput")
-          option(value=0) 0
-          option(value=15) 15
-          option(value=30) 30
-          option(value=45) 45
-        button#minutesMinus(onclick="changeInput('#minutesInput', -15)") -15
-    #timeLabels
-      label(for="hoursInput") Hours 
-      label(for="minutesInput") Minutes 
-    #hoursTypeContainer
-      label#hoursTypeLabel(for="hoursType") Type of hours: 
-      select#hoursType.selector(name="hoursType")
-        option(value="worked") Worked
-        option(value="vacation") Vacation
-    #organizationSelectContainer.hidden 
-      label#organizationSelectLabel(for="organizationSelect") Organization: 
-      select#organizationSelect.selector(name="organizationSelect")
-    button#submitHours(type="submit" onclick="submitHours()") Submit
+    if user
+      #hoursPrompt.pageTitle Enter your hours
+      #date
+        button#yesterday(onclick="document.querySelector('#dateInput').stepDown()")
+          i.rightArrow.fa-solid.fa-arrow-left-long
+        input#dateInput(type="date")
+        button#tomorrow(onclick="document.querySelector('#dateInput').stepUp()")
+          i.rightArrow.fa-solid.fa-arrow-right-long
+      #time
+        #hours 
+          button#hoursPlus(onclick="changeInput('#hoursInput', 1)") +1
+          select#hoursInput(name="hoursInput")
+            - var i = 0
+            while i < 25
+              option(value=i)= i++
+          button#hoursMinus(onclick="changeInput('#hoursInput', -1)") -1
+        #minutes
+          button#minutesPlus(onclick="changeInput('#minutesInput', 15)") +15
+          select#minutesInput(name="minutesInput")
+            option(value=0) 0
+            option(value=15) 15
+            option(value=30) 30
+            option(value=45) 45
+          button#minutesMinus(onclick="changeInput('#minutesInput', -15)") -15
+      #timeLabels
+        label(for="hoursInput") Hours 
+        label(for="minutesInput") Minutes 
+      #hoursTypeContainer
+        label#hoursTypeLabel(for="hoursType") Type of hours: 
+        select#hoursType.selector(name="hoursType")
+          option(value="worked") Worked
+          option(value="vacation") Vacation
+      #organizationSelectContainer.hidden 
+        label#organizationSelectLabel(for="organizationSelect") Organization: 
+        select#organizationSelect.selector(name="organizationSelect")
+      button#submitHours(type="submit" onclick="submitHours()") Submit
   #footer
     i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
     if user

@@ -33,6 +33,13 @@ window.addEventListener("load", function () {
       });
       $("#organizationSelectContainer").classList.remove("hidden");
     }
+    if (orgs.length == 0) {
+      $("#indexContainer").innerHTML = `
+          <div id="noOrgsTitle" class="pageTitle">Welcome!</div>
+          <div id="noOrgsPrompt">Please join an organization to get started.</div>
+          <div id="noOrgsDesc">Click on the menu icon and select organizations to enter a code</div>
+        `;
+    }
   });
 });
 
