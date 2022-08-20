@@ -12,7 +12,9 @@ window.addEventListener("load", function () {
     return local.toJSON().slice(0, 10);
   };
 
-  $("#dateInput").value = new Date().toDateInputValue();
+  if ($("#dateInput")) {
+    $("#dateInput").value = new Date().toDateInputValue();
+  }
 
   $("#addOrgInputs input").addEventListener("keyup", function () {
     $("#addOrgInputs input").value = $(
@@ -73,7 +75,7 @@ function submitHours() {
     type: theType,
     organization: theOrg,
   };
-  efsFetch("/api/submit", body, function (res) {
+  eftFetch("/api/submit", body, function (res) {
     var htmlString = `
       <div class="success-checkmark">
         <div class="check-icon">

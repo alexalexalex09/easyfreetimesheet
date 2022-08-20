@@ -101,6 +101,75 @@ router.post(
 );
 
 router.post(
+  "/getOrg",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+
+    if (!req.body.code) {
+      res.send({ err: "Invalid code" });
+      return;
+    }
+    const curUser = await User.findOne({ profile_id: req.user.id })
+      .populate("organizations", "code name")
+      .exec();
+    const organization = await Organization.findOne({
+      $and: [{ $match: { owner: curUser._id } }, { code: req.body.code }],
+    })
+      .populate("owners")
+      .populate("approvers")
+      .populate("payPeriods")
+      .exec();
+    const unapprovedPeriods = await PayPeriod.find({
+      $and: [{ owner: organization._id }, { fullyApproved: false }],
+    })
+      .populate("owner", "name code")
+      .exec();
+    const approvedPeriods = await PayPeriod.find({
+      $and: [{ owner: organization._id }, { fullyApproved: true }],
+    })
+      .populate("owner", "name code")
+      .exec();
+    toApprove = [];
+    upcoming = [];
+    const orgHours = await Hours.find({
+      organization: organization._id,
+    }).exec();
+    unapprovedPeriods.forEach(function (period) {
+      var start = DateTime.fromJSDate(period.start, { zone: "utc" });
+      var end = DateTime.fromJSDate(period.end, { zone: "utc" });
+      var index = orgHours.findIndex(function (v) {
+        var date = DateTime.fromJSDate(v.date, { zone: "utc" });
+        return start <= date && date <= end;
+      });
+      if (index > -1) {
+        toApprove.push(period);
+      } else {
+        upcoming.push(period);
+      }
+    });
+
+    User.find({ $match: { organizations: organization._id } })
+      .exec()
+      .then(function (users, err) {
+        if (organization) {
+          res.send({
+            org: organization,
+            users: users,
+            approvedPeriods: approvedPeriods,
+            toApprove: toApprove,
+            upcoming: upcoming,
+          });
+        } else {
+          res.send({ err: "none" });
+        }
+      });
+  })
+);
+
+router.post(
   "/getOrgs",
   ash(async function (req, res, next) {
     if (!req.user) {
@@ -113,10 +182,10 @@ router.post(
     )
       .populate("organizations", "name code")
       .exec();
-    if (curUser.organizations.length != 0) {
-      res.send(curUser.organizations);
-    } else {
+    if (curUser == null || curUser.organizations.length == 0) {
       res.send({ err: "none" });
+    } else {
+      res.send(curUser.organizations);
     }
   })
 );
@@ -235,7 +304,7 @@ router.post(
         const curUser = await User.findOne({
           profile_id: req.user.id,
         }).exec();
-        const theCode = await makeid();
+        const theCode = await createOrgCode();
         const newOrg = new Organization({
           name: req.body.name,
           owners: [curUser._id],
@@ -475,8 +544,43 @@ router.post(
       v == req.body._id;
     });
     if (index == -1) {
-      curUser.approvedPayPeriods.push(req.body._id);
+      curUser.approvedPayPeriods.push(curUser._id);
       curUser.save().then(function (result) {
+        res.send(result);
+      });
+    } else {
+      res.send({ err: "Already approved" });
+    }
+  })
+);
+
+router.post(
+  "/adminApprovePeriod",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    if (!req.body.start) {
+      res.send({ err: "Empty Pay Period" });
+    }
+    if (!req.body.org) {
+      res.send({ err: "No organization" });
+    }
+    const curUser = await User.findOne({ profile_id: req.user.id });
+    const curOrg = await Organization.findOne({
+      $and: [{ code: req.body.org }, { owner: curUser._id }],
+    }).exec();
+    var curPeriod = await PayPeriod.findOne({
+      $and: [{ start: req.body.start }, { owner: curOrg._id }],
+    });
+    const index = curPeriod.approvedBy.findIndex(function (v) {
+      v == curUser._id;
+    });
+    if (index == -1) {
+      curPeriod.approvedBy.push(curUser._id);
+      curPeriod.fullyApproved = true;
+      curPeriod.save().then(function (result) {
         res.send(result);
       });
     } else {
@@ -507,6 +611,108 @@ router.post(
     } else {
       res.send({ err: "Already approved" });
     }
+  })
+);
+
+router.post(
+  "/adminRevokePeriod",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    if (!req.body.start) {
+      res.send({ err: "Empty Pay Period" });
+    }
+    if (!req.body.org) {
+      res.send({ err: "No organization" });
+    }
+    const curUser = await User.findOne({ profile_id: req.user.id });
+    const curOrg = await Organization.findOne({
+      $and: [{ code: req.body.org }, { owner: curUser._id }],
+    }).exec();
+    var curPeriod = await PayPeriod.findOne({
+      $and: [{ start: req.body.start }, { owner: curOrg._id }],
+    });
+    console.log({ curPeriod });
+    console.log(curUser._id);
+    const index = curPeriod.approvedBy.findIndex(function (approver) {
+      return approver.toString() == curUser._id.toString();
+    });
+    console.log({ index });
+    if (index != -1) {
+      curPeriod.approvedBy.splice(index, 1);
+      curPeriod.fullyApproved = false;
+      curPeriod.save().then(function (result) {
+        res.send(result);
+      });
+    } else {
+      res.send({ err: "Not yet approved" });
+    }
+  })
+);
+
+router.post(
+  "/getUserDetails",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    const curUser = await User.findOne({ profile_id: req.user.id })
+      .populate("organizations", "name code")
+      .populate("approvedPayPeriods")
+      .exec();
+    res.send({ user: curUser, hours: hoursList });
+  })
+);
+
+router.post(
+  "/getPayPeriodByOrg",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    const curUser = await User.findOne({ profile_id: req.user.id })
+      .populate("approvedPayPeriods")
+      .exec();
+    const curOrg = await Organization.findOne({
+      $and: [{ $match: { owner: curUser._id } }, { code: req.body.code }],
+    });
+    const startDate = new Date(req.body.startDate);
+    const curPeriod = await PayPeriod.findOne({
+      $and: [{ start: startDate }, { owner: curOrg._id }],
+    });
+    var usersList = await User.find({ organization: curOrg._id }).exec();
+    const curHours = await Hours.find({ organization: curOrg._id }).populate(
+      "user",
+      "profile_id displayName"
+    );
+    const start = DateTime.fromJSDate(curPeriod.start, { zone: "utc" });
+    const end = DateTime.fromJSDate(curPeriod.end, { zone: "utc" });
+    var users = [];
+    usersList.forEach(function (user) {
+      var approverIndex = curPeriod.approvedBy.findIndex(function (approver) {
+        return approver == user._id;
+      });
+      users.push({
+        displayName: user.displayName,
+        profile_id: user.profile_id,
+        hours: [],
+        approved: approverIndex != -1,
+      });
+    });
+    curHours.forEach(function (v) {
+      var date = DateTime.fromJSDate(v.date, { zone: "utc" });
+      if (start <= date && date <= end) {
+        var index = users.findIndex(function (user) {
+          return user.profile_id == v.user.profile_id;
+        });
+        users[index].hours.push(v);
+      }
+    });
+    res.send({ org: curOrg, users: users, period: curPeriod });
   })
 );
 

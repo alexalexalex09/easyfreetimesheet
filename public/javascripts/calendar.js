@@ -7,13 +7,13 @@ if (typeof $$ == "undefined") {
 
 window.addEventListener("load", function () {
   DateTime = luxon.DateTime;
-  efsFetch("/api/getPeriods", {}, function (res) {
+  eftFetch("/api/getPeriods", {}, function (res) {
     storePayPeriods(res).then(function (res) {
       calendarInit();
       const thisMonth = $("calendarInfoItem").getAttribute("data-month");
       console.log({ res });
       showOrgList(res, thisMonth);
-      efsFetch("/api/getHours", {}, function (res) {
+      eftFetch("/api/getHours", {}, function (res) {
         localforage.setItem("hours", res).then(function () {
           showHours();
         });
@@ -404,7 +404,7 @@ function deleteRecord(_id) {
 }
 
 function confirmDelete(_id) {
-  efsFetch("/api/deleteRecord", { _id: _id }, function (res) {
+  eftFetch("/api/deleteRecord", { _id: _id }, function (res) {
     if (res.hours) {
       localforage.setItem("hours", res.hours).then(function () {
         showHours();
@@ -427,7 +427,7 @@ function submitRecordEdit(_id) {
     organization: org,
     date: $("#editDate").value,
   };
-  efsFetch("/api/editRecord", body, function (res) {
+  eftFetch("/api/editRecord", body, function (res) {
     if (res.hours) {
       localforage.setItem("hours", res.hours).then(function () {
         showHours();

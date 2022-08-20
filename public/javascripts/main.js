@@ -15,19 +15,19 @@ window.addEventListener("load", function () {
   };
 });
 
-async function efsFetch(req, body, handler, errorHandler) {
+async function eftFetch(req, body, handler, errorHandler) {
   var promise = new Promise(function (resolve, reject) {
     if (body === "") {
       body = {};
     }
-    const efs_options = {
+    const eft_options = {
       method: "POST",
       body: JSON.stringify(body),
       headers: {
         "Content-Type": "application/json",
       },
     };
-    fetch(req, efs_options).then(function (response) {
+    fetch(req, eft_options).then(function (response) {
       return response.json().then((res) => {
         if (res.err) {
           if (errorHandler) {
@@ -108,6 +108,33 @@ function storePayPeriods(payPeriods) {
     localforage.setItem("payPeriods", storage).then(function (res) {
       resolve(storage);
     });
+  });
+  return promise;
+}
+
+function showSuccessCheck() {
+  var promise = new Promise(function (resolve, reject) {
+    var htmlString = `
+      <div class="success-checkmark">
+        <div class="check-icon">
+          <span class="icon-line line-tip"></span>
+          <span class="icon-line line-long"></span>
+          <div class="icon-circle"></div>
+          <div class="icon-fix"></div>
+        </div>
+      </div>
+    `;
+    var el = document.createElement("div");
+    el.classList.add("successAlert");
+    el.innerHTML = htmlString;
+    $("body").append(el);
+    setTimeout(function () {
+      el.style.opacity = 0;
+      setTimeout(function () {
+        el.remove();
+        resolve();
+      }, 100);
+    }, 2000);
   });
   return promise;
 }

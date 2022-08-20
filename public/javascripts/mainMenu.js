@@ -16,7 +16,7 @@ window.addEventListener("load", function () {
 });
 
 function getMenuOrgs() {
-  efsFetch(
+  eftFetch(
     "/api/getOrgs",
     {},
     function (res) {
@@ -73,7 +73,7 @@ function closeOrgMenu() {
 
 function joinOrg() {
   const body = { code: $("#addOrgInputs input").value };
-  efsFetch("/api/joinOrg", body, function (res) {
+  eftFetch("/api/joinOrg", body, function (res) {
     $("#addOrgInputs input").value = "";
     getMenuOrgs();
   });

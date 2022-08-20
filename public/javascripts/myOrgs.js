@@ -10,13 +10,13 @@ window.addEventListener("load", function () {
 });
 
 function loadMyOrgs() {
-  efsFetch(
+  eftFetch(
     "/api/getMyOrgs",
     {},
     function (res) {
       var htmlString = ``;
       for (const org of res) {
-        htmlString += `<div class="org"><div class="orgName">${org.name}</div><div class="orgCode">${org.code}</div></div>`;
+        htmlString += `<div class="org"><div class="orgName">${org.name}</div><div class="orgCode"><a href="/myOrgs/${org.code}">${org.code}</a></div></div>`;
       }
       $("#orgs").innerHTML = htmlString;
     },
@@ -40,7 +40,7 @@ function createOrg() {
     const body = {
       name: $("#createOrg input").value,
     };
-    efsFetch("/api/createOrg", body, function (res) {
+    eftFetch("/api/createOrg", body, function (res) {
       console.log("Success!");
       $("#createOrg input").value = "Success!";
       loadMyOrgs();

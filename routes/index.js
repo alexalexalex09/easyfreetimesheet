@@ -10,6 +10,22 @@ router.get("/myOrgs", function (req, res, next) {
   res.render("myOrgs", { title: "Timecard.live" });
 });
 
+router.get("/myOrgs/:orgCode", (req, res) => {
+  var orgCode = req.params.orgCode.toUpperCase();
+  res.render("orgPage", {
+    orgCode: orgCode,
+  });
+});
+
+router.get("/myOrgs/:orgCode/payperiod/:startDate", (req, res) => {
+  var orgCode = req.params.orgCode.toUpperCase();
+  var startDate = req.params.startDate + "T00:00:00.000Z";
+  res.render("payPeriodPage", {
+    orgCode: orgCode,
+    startDate: startDate,
+  });
+});
+
 router.get("/hours", function (req, res, next) {
   res.render("hours", { title: "Timecard.live" });
 });

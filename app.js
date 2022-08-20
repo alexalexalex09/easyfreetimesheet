@@ -10,7 +10,6 @@ var logger = require("morgan");
 const User = require("./models/users.js"); //Need for auth
 
 var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
 var apiRouter = require("./routes/api");
 var authRouter = require("./routes/auth");
 
@@ -73,9 +72,39 @@ passport.use(
             displayName: profile.displayName,
           },
         },
-        { upsert: true }
+        { upsert: true, new: true }
       ).exec(function (err, curUser) {
-        return cb(err, profile);
+        console.log({ err });
+        console.log({ curUser });
+        if (
+          typeof curUser.hourLimits == "undefined" ||
+          typeof curUser.hourLimits.maxYearly == "undefined"
+        ) {
+          curUser.hourLimits = {
+            maxYearly: 40 * 48,
+            regularHours: 40,
+            vacation: 40 * 4,
+          };
+        }
+        curUser.save().then(function (curUser) {
+          User.find({ internalId: { $exists: true } }, "internalId").exec(
+            function (err, codeList) {
+              console.log({ err });
+              console.log({ codeList });
+              if (typeof curUser.internalId == "undefined") {
+                codeList = codeList.map(function (e) {
+                  return typeof e.code == "undefined" ? "" : e.code;
+                });
+                console.log({ codeList });
+                curUser.internalId = makeId(6, codeList);
+              }
+              curUser.save().then(function (curUser) {
+                console.log({ curUser });
+                return cb(err, profile);
+              });
+            }
+          );
+        });
       });
     }
   )
@@ -110,7 +139,6 @@ app.use((req, res, next) => {
 });
 
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
 app.use("/api", apiRouter);
 app.use("/", authRouter);
 
@@ -129,5 +157,24 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+
+function makeId(length = 5, checkList = []) {
+  //TODO: Filter out bad words
+  var result = "";
+  var characters = "ABCEGHJKLMNPQRTUVWXYZ0123456789";
+  var charactersLength = characters.length;
+  var dup = true;
+  do {
+    for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    if (checkList) {
+      dup = checkList.findIndex((obj) => obj == result) > -1;
+    } else {
+      dup = false;
+    }
+  } while (dup);
+  return result;
+}
 
 module.exports = app;

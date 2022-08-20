@@ -9,6 +9,7 @@ var UserSchema = new Schema(
     lastName: String,
     displayName: String,
     profile_id: String,
+    internalId: String,
     darkMode: Boolean,
     hourLimits: { maxYearly: Number, regularHours: Number, vacation: Number },
     organizations: [{ type: Schema.Types.ObjectId, ref: "Organization" }],

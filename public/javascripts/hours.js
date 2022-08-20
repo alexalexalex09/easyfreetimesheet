@@ -32,7 +32,7 @@ function orgSelectorInit(Periods) {
 }
 
 async function getPeriodsWithApprovals() {
-  const Periods = await efsFetch("/api/getPeriodsWithApprovals", {});
+  const Periods = await eftFetch("/api/getPeriodsWithApprovals", {});
   const { hours, orgs, periods } = Periods;
   localforage.setItem("hours", hours);
   localforage.setItem("organizations", orgs);
@@ -208,14 +208,14 @@ function changeDisplayPeriods() {
 }
 
 function approvePeriod(_id) {
-  efsFetch("/api/approvePeriod", { _id: _id }, async function (res) {
+  eftFetch("/api/approvePeriod", { _id: _id }, async function (res) {
     const Periods = await getPeriodsWithApprovals();
     createPeriodsList(Periods);
   });
 }
 
 function revokePeriod(_id) {
-  efsFetch("/api/revokePeriod", { _id: _id }, async function (res) {
+  eftFetch("/api/revokePeriod", { _id: _id }, async function (res) {
     const Periods = await getPeriodsWithApprovals();
     createPeriodsList(Periods);
   });
