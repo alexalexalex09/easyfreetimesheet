@@ -151,7 +151,7 @@ router.post(
       }
     });
 
-    User.find({ $match: { organizations: organization._id } })
+    User.find({ $match: { organizations: organization._id } }, { _id: 0 })
       .exec()
       .then(function (users, err) {
         if (organization) {

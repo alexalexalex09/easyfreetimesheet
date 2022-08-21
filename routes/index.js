@@ -26,6 +26,13 @@ router.get("/myOrgs/:orgCode/payperiod/:startDate", (req, res) => {
   });
 });
 
+router.get("/user/:userCode", (req, res) => {
+  var userCode = req.params.orgCode.toUpperCase();
+  res.render("userPage", {
+    userCode: userCode,
+  });
+});
+
 router.get("/hours", function (req, res, next) {
   res.render("hours", { title: "Timecard.live" });
 });

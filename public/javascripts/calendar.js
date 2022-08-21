@@ -247,9 +247,11 @@ function showHours() {
     el.remove();
   });
   localforage.getItem("hours").then(function (hoursRecords) {
-    hoursRecords = hoursRecords.filter(function (v) {
-      return v.organization.code == $("#periodList").value;
-    });
+    if (!$("#periodList") == null) {
+      hoursRecords = hoursRecords.filter(function (v) {
+        return v.organization.code == $("#periodList").value;
+      });
+    }
     var currentMonth = $("calendarInfoItem").getAttribute("data-month");
     var currentYear = $("calendarInfoItem").getAttribute("data-year");
     var lastDay = DateTime.fromObject(

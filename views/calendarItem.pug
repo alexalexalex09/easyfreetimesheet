@@ -1,0 +1,41 @@
+calendarInfoItem.hidden
+#calendar
+  #dateBar
+    i.fa-solid.fa-angles-left.clickable(onclick="changeMonth(-1)") 
+    #dateBarDateContainer
+      span#dateBarMonth.clickable(onclick="showSelectMonth()")
+      span#dateBarYear.clickable(onclick="showSelectYear()") 
+    i.fa-solid.fa-angles-right.clickable(onclick="changeMonth(1)")
+  #weekDays
+    .weekDay Sun
+    .weekDay Mon 
+    .weekDay Tue 
+    .weekDay Wed 
+    .weekDay Thu 
+    .weekDay Fri 
+    .weekDay Sat
+  #dates 
+#periodLegend
+  #periodLegendTitle
+  #legendList
+#calendarShadow.hidden(onclick="closeModals()")
+#yearModal.calendarModal.hidden 
+  #yearModalTitle Input Year
+  input(type="number" max="3000" min="2000")
+  button(type="submit" onclick="setYear()") Go
+#monthModal.calendarModal.hidden
+  .monthModalOption.clickable(onclick="setMonth(1)") Jan 
+  .monthModalOption.clickable(onclick="setMonth(2)") Feb 
+  .monthModalOption.clickable(onclick="setMonth(3)") Mar 
+  .monthModalOption.clickable(onclick="setMonth(4)") Apr 
+  .monthModalOption.clickable(onclick="setMonth(5)") May 
+  .monthModalOption.clickable(onclick="setMonth(6)") Jun 
+  .monthModalOption.clickable(onclick="setMonth(7)") Jul 
+  .monthModalOption.clickable(onclick="setMonth(8)") Aug 
+  .monthModalOption.clickable(onclick="setMonth(9)") Sep 
+  .monthModalOption.clickable(onclick="setMonth(10)") Oct 
+  .monthModalOption.clickable(onclick="setMonth(11)") Nov
+  .monthModalOption.clickable(onclick="setMonth(12)") Dec
+#hoursModal.calendarModal.hidden
+  #hoursDetailDate
+  #hoursModalRecords

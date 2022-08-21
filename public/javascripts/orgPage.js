@@ -35,12 +35,12 @@ function loadUsers(users) {
         <div class="editUser" onclick="editUser(this)"><i class="fa-solid fa-user-gear"></i></div>
         <div class="editUserModal calendarModal hidden">
           <div class="userDetailName">${user.displayName}</div>
-          <button class="userDetailEdit" onclick="window.location='/user/${user._id}'">Edit User Profile</button>
+          <button class="userDetailEdit" onclick="window.location='/user/${user.internalId}'">Edit User Profile</button>
           <div class="userDetailWeekly">Weekly hours: ${user.hourLimits.regularHours}</div>
           <div class="userDetailYearly">Yearly hours: ${user.hourLimits.maxYearly}</div>
           <div class="userDetailVacation">Vacation hours: ${user.hourLimits.vacation}</div>
         </div>
-        <div class="removeUser onclick="removeUser('${user._id}')"><i class="fa-solid fa-user-xmark"></i></div>
+        <div class="removeUser" onclick="removeUser('${user.internalId}')"><i class="fa-solid fa-user-xmark"></i></div>
       </div>
     `;
   });
@@ -78,3 +78,5 @@ function fillPeriods(periods, el) {
 
   $(el).innerHTML = htmlString;
 }
+
+function removeUser() {}
