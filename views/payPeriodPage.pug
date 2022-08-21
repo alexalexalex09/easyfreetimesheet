@@ -1,0 +1,18 @@
+extends layout
+
+block scripts 
+  script(type="text/javascript" src="/javascripts/payPeriodPage.js")
+
+block content
+  #payPeriodPageContainer.mainContainer
+    #orgTitle.pageTitle 
+    #payPeriodTitle.pageTitle 
+    #payPeriodApprove
+      button#payperiodApproveCancel(onclick="backToOrg()") Cancel
+      button#payPeriodApproveButton(onclick="approvePeriod()") Approve
+    #payPeriodUsersList
+  #calendarShadow.hidden(onclick="closeModals()")
+  #footer
+    i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
+    i#homeButton.fa-solid.fa-house(onclick="window.location='/'")
+  include menu

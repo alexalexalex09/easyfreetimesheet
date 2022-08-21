@@ -1,0 +1,21 @@
+extends layout
+
+block scripts 
+  script(type="text/javascript" src="/javascripts/orgPage.js")
+
+block content
+  #orgContainer.mainContainer
+    #orgTitle.pageTitle
+    #toApproveTitle.orgPageTitle Periods to Approve
+    #toApproveList.orgPageList
+    #orgUsersTitle.orgPageTitle Users
+    #orgUsersList.orgPageList 
+    #approvedTitle.orgPageTitle Approved Pay Periods
+    #approvedList.orgPageList
+    #upcomingTitle.orgPageTitle Upcoming Pay Periods 
+    #upcomingList.orgPageList
+  #calendarShadow.hidden(onclick="closeModals()")
+  #footer
+    i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
+    i#homeButton.fa-solid.fa-house(onclick="window.location='/'")
+  include menu
