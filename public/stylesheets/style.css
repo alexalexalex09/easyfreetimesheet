@@ -765,7 +765,7 @@ div#login {
   font-size: 1.5rem;
 }
 
-#orgContainer.mainContainer {
+#orgContainer.mainContainer, #userContainer.mainContainer {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -773,7 +773,7 @@ div#login {
   justify-content: flex-start;
 } 
 
-.orgPageTitle {
+.orgPageTitle, .userPageTitle {
   background-color: var(--main-highlight);
   color: var(--main-black);
   padding: 8px 0px;

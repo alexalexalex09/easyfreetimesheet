@@ -10,6 +10,15 @@ var OrganizationSchema = new Schema(
     approvers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     code: String,
     payPeriods: [{ type: Schema.Types.ObjectId, ref: "PayPeriod" }],
+    users: [
+      {
+        user: { type: Schema.Types.ObjectId, ref: "User" },
+        yearlyHoursLimit: Number,
+        regularHours: Number,
+        regularHoursType: String,
+        yearlyVacationHours: Number,
+      },
+    ],
   },
   { collection: "organizations" }
 );

@@ -116,7 +116,7 @@ router.post(
       .populate("organizations", "code name")
       .exec();
     const organization = await Organization.findOne({
-      $and: [{ $match: { owner: curUser._id } }, { code: req.body.code }],
+      $and: [{ owner: curUser._id }, { code: req.body.code }],
     })
       .populate("owners")
       .populate("approvers")
@@ -151,7 +151,7 @@ router.post(
       }
     });
 
-    User.find({ $match: { organizations: organization._id } }, { _id: 0 })
+    User.find({ organizations: organization._id }, { _id: 0 })
       .exec()
       .then(function (users, err) {
         if (organization) {
@@ -163,7 +163,7 @@ router.post(
             upcoming: upcoming,
           });
         } else {
-          res.send({ err: "none" });
+          res.send({ err: "No user found" });
         }
       });
   })
@@ -183,7 +183,7 @@ router.post(
       .populate("organizations", "name code")
       .exec();
     if (curUser == null || curUser.organizations.length == 0) {
-      res.send({ err: "none" });
+      res.send({ err: "No organization found" });
     } else {
       res.send(curUser.organizations);
     }
@@ -207,7 +207,7 @@ router.post(
     if (orgs.length != 0) {
       res.send(orgs);
     } else {
-      res.send({ err: "none" });
+      res.send({ err: "No organizations" });
     }
   })
 );
@@ -343,6 +343,9 @@ router.post(
       curUser = await User.findOne({ profile_id: req.user.id })
         .populate("organizations", "code")
         .exec();
+      if (curOrganization != null || curUser != null) {
+        res.send({ err: "Invalid" });
+      }
       if (
         curUser.organizations.findIndex(function (el) {
           return req.body.code == el.code;
@@ -635,7 +638,7 @@ router.post(
       $and: [{ start: req.body.start }, { owner: curOrg._id }],
     });
     console.log({ curPeriod });
-    console.log(curUser._id);
+    console.log(curUser._id.toString());
     const index = curPeriod.approvedBy.findIndex(function (approver) {
       return approver.toString() == curUser._id.toString();
     });
@@ -678,7 +681,7 @@ router.post(
       .populate("approvedPayPeriods")
       .exec();
     const curOrg = await Organization.findOne({
-      $and: [{ $match: { owner: curUser._id } }, { code: req.body.code }],
+      $and: [{ owner: curUser._id }, { code: req.body.code }],
     });
     const startDate = new Date(req.body.startDate);
     const curPeriod = await PayPeriod.findOne({
@@ -707,7 +710,7 @@ router.post(
       var date = DateTime.fromJSDate(v.date, { zone: "utc" });
       if (start <= date && date <= end) {
         var index = users.findIndex(function (user) {
-          return user.profile_id == v.user.profile_id;
+          return user.profile_id == v.user_profile_id;
         });
         users[index].hours.push(v);
       }

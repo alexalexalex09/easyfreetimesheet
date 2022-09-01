@@ -46,10 +46,8 @@ function loadUsers(users) {
   var htmlString = ``;
   var totalHours = 0;
   var totalMinutes = 0;
-  console.log({ users });
   for (const userKey in users) {
     const user = users[userKey];
-    console.log({ user });
     var hoursString = ``;
     user.hours.sort(function (a, b) {
       return (
@@ -116,15 +114,15 @@ function revokePeriod() {
     start: startDate,
     org: orgCode,
   };
-  eftFetch("/api/adminRevokePeriod", body).then(function (res) {
-    if (res.err) {
-      createAndShowAlert(res.err);
-      $("#calendarShadow").classList.add("hidden");
-    } else {
+  eftFetch("/api/adminRevokePeriod", body).then(
+    function (res) {
       showSuccessCheck().then(function () {
         window.location.href = window.location.href.slice(0, -21);
       });
       console.log({ res });
+    },
+    function (err) {
+      $("#calendarShadow").classList.add("hidden");
     }
-  });
+  );
 }

@@ -27,7 +27,7 @@ router.get("/myOrgs/:orgCode/payperiod/:startDate", (req, res) => {
 });
 
 router.get("/user/:userCode", (req, res) => {
-  var userCode = req.params.orgCode.toUpperCase();
+  var userCode = req.params.userCode.toUpperCase();
   res.render("userPage", {
     userCode: userCode,
   });
