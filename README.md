@@ -11,4 +11,3 @@ A simple way for small business employees to submit hours worked
 - [ ] Record hours without an organization
 - [ ] Optionally record clock in and clock out times
 - [ ] Optionally allow employees to see remaining hours of various types
-- [ ] 
