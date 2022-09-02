@@ -235,16 +235,17 @@ function defaultPayPeriods(owner) {
         },
         { zone: "utc" }
       );
-      console.log({ start });
+      var dueDate = end.plus({ days: 7 });
       start = new Date(start.toISO());
-      console.log({ start });
       end = new Date(end.toISO());
+      dueDate = new Date(dueDate.toISO());
       payPeriodsArray.push({
         insertOne: {
           document: {
             owner: owner,
             start: start,
             end: end,
+            dueDate: dueDate,
             approvedBy: [],
             fullyApproved: false,
           },
@@ -259,14 +260,17 @@ function defaultPayPeriods(owner) {
         { zone: "utc" }
       );
       end = start.endOf("month");
+      dueDate = end.plus({ days: 7 });
       start = new Date(start.toISO());
       end = new Date(end.toISO());
+      dueDate = new Date(dueDate.toISO());
       payPeriodsArray.push({
         insertOne: {
           document: {
             owner: owner,
             start: start,
             end: end,
+            dueDate: dueDate,
             approvedBy: [],
             fullyApproved: false,
           },
@@ -343,7 +347,11 @@ router.post(
       curUser = await User.findOne({ profile_id: req.user.id })
         .populate("organizations", "code")
         .exec();
-      if (curOrganization != null || curUser != null) {
+      var firstOrg = false;
+      if (curUser.organizations.length == 0) {
+        firstOrg = true;
+      }
+      if (curOrganization == null || curUser == null) {
         res.send({ err: "Invalid" });
       }
       if (
@@ -353,6 +361,16 @@ router.post(
       ) {
         curUser.organizations.push(curOrganization._id);
         await curUser.save();
+        if (firstOrg) {
+          var curHours = await Hours.find({ user: curUser._id }).exec();
+          console.log({ curHours });
+          if (curHours.length > 0) {
+            curHours.forEach(function (hours) {
+              hours.organization = curOrganization._id;
+              hours.save();
+            });
+          }
+        }
         res.send({ success: "success" });
       } else {
         res.send({ err: "Already joined" });

@@ -8,6 +8,7 @@ var PayPeriodSchema = new Schema(
     owner: { type: Schema.Types.ObjectId, ref: "Organization" },
     start: Date,
     end: Date,
+    dueDate: Date,
     approvedBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
     fullyApproved: Boolean,
   },

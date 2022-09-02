@@ -90,6 +90,7 @@ function storePayPeriods(payPeriods) {
     payPeriods.forEach(function (v) {
       const periodStart = DateTime.fromISO(v.start, { zone: "utc" });
       const periodEnd = DateTime.fromISO(v.end, { zone: "utc" });
+      const periodDue = DateTime.fromISO(v.dueDate, { zone: "utc" });
       storage.push({
         periodStart: {
           day: periodStart.day,
@@ -101,6 +102,12 @@ function storePayPeriods(payPeriods) {
           day: periodEnd.day,
           month: periodEnd.month,
           year: periodEnd.year,
+          owner: v.owner,
+        },
+        periodDue: {
+          day: periodDue.day,
+          month: periodDue.month,
+          year: periodDue.year,
           owner: v.owner,
         },
       });
