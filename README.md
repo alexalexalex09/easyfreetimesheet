@@ -32,6 +32,6 @@ A simple way for small business employees to submit hours worked
 - [ ] Edit pay periods and adjust pay period schedule using several defaults, including bimonthly, biweekly, monthly, and weekly pay 
 - [ ] Adjust pay period due dates
 - [ ] Add and edit types of hours
-- [ ] Remove Users- [ ] 
+- [ ] Remove Users
 - [x] Manage multiple organizations
 - [ ] Send an automatic email to a designated bookkeeper when a pay period has been approved
