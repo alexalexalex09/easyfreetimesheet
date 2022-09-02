@@ -79,4 +79,11 @@ function fillPeriods(periods, el) {
   $(el).innerHTML = htmlString;
 }
 
-function removeUser() {}
+function removeUser(userId) {
+  console.log("Removing");
+  eftFetch("/api/removeUserFromOrg", { code: orgCode, userId: userId }).then(
+    function (users) {
+      loadUsers(users);
+    }
+  );
+}

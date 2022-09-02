@@ -4,13 +4,13 @@ A simple way for small business employees to submit hours worked
 
 ## Features
 ### Easy login and account management
-- [ ] Login with username/password
 - [x] Login with Google
-- [ ] Login with Microsoft
 - [ ] Delete your account
 - [ ] View your profile
 - [ ] Edit your profile
 - [ ] Remove yourself from an organization
+- [ ] Login with username/password
+- [ ] Login with Microsoft
 
 ### Easy to record hours
 - [x] Simple to record today's or yesterday's hours
@@ -20,10 +20,10 @@ A simple way for small business employees to submit hours worked
 - [x] Connect to an organization
 - [x] Record hours without an organization
 - [x] Record hours for multiple organizations
+- [x] Visual reminders of upcoming pay period due dates
 - [ ] Optionally record clock in and clock out times
-- [ ] Receive an email reminder when a pay period is coming due
-- [ ] Visual reminders of upcoming pay period due dates
-- [ ] Download your pay period 
+- [ ] Optionally receive an email reminder when a pay period is coming due
+- [ ] Download your pay periods
 
 ### Easy to manage an organization
 - [ ] Employees can see remaining hours of various types
@@ -32,6 +32,6 @@ A simple way for small business employees to submit hours worked
 - [ ] Edit pay periods and adjust pay period schedule using several defaults, including bimonthly, biweekly, monthly, and weekly pay 
 - [ ] Adjust pay period due dates
 - [ ] Add and edit types of hours
-- [ ] Remove Users
+- [x] Remove users from your organization
 - [x] Manage multiple organizations
 - [ ] Send an automatic email to a designated bookkeeper when a pay period has been approved

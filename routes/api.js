@@ -363,7 +363,6 @@ router.post(
         await curUser.save();
         if (firstOrg) {
           var curHours = await Hours.find({ user: curUser._id }).exec();
-          console.log({ curHours });
           if (curHours.length > 0) {
             curHours.forEach(function (hours) {
               hours.organization = curOrganization._id;
@@ -392,6 +391,7 @@ router.post(
     )
       .populate("organization", "code name")
       .exec();
+    console.log({ theHours });
     res.send(theHours);
   })
 );
@@ -458,6 +458,7 @@ router.post(
     const curHours = await Hours.find({
       user_profile_id: req.user.id,
     }).populate("organization", "name code");
+    consolue.log({ curHours });
     const curOrgs = curUser.organizations;
     res.send({
       hours: curHours,
@@ -734,6 +735,39 @@ router.post(
       }
     });
     res.send({ org: curOrg, users: users, period: curPeriod });
+  })
+);
+
+router.post(
+  "/removeUserFromOrg",
+  ash(async function (req, res, next) {
+    console.log("Removing");
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    const curUser = await User.findOne({ profile_id: req.user.id });
+    var userToRemove = await User.findOne({ internalId: req.body.userId });
+    var curOrganization = await Organization.findOne({ code: req.body.code });
+    var curUserIsOwner = curOrganization.owners.indexOf(curUser._id) > -1;
+    if (!curUserIsOwner) {
+      res.send({
+        err: "Currently logged in user does not own the appropriate organization",
+      });
+    }
+    var index = userToRemove.organizations.indexOf(curOrganization._id);
+    if (index == -1) {
+      res.send({ err: "User does not belong to this organization" });
+    }
+    userToRemove.organizations.splice(index, 1);
+    await userToRemove.save();
+    const users = await User.find(
+      { organizations: curOrganization._id },
+      { _id: 0 }
+    ).exec();
+    console.log(typeof users);
+    console.log({ users });
+    res.send(users);
   })
 );
 

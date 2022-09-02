@@ -200,6 +200,15 @@ function updatePayPeriods(payPeriods, thisMonth) {
       "owner-" + period.periodEnd.owner.code
     );
   });
+  var monthlyDueDates = payPeriods.filter(function (v) {
+    return v.periodDue.month == thisMonth;
+  });
+  monthlyDueDates.forEach(function (period) {
+    $(".day" + period.periodDue.day).classList.add("periodDue");
+    $(".day" + period.periodEnd.day).classList.add(
+      "owner-" + period.periodEnd.owner.code
+    );
+  });
 }
 
 function showOrgNameDropDown(orgNameList) {
