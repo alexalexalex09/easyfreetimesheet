@@ -15,6 +15,7 @@ A simple way for small business employees to submit hours worked
 ### Easy to record hours
 - [x] Simple to record today's or yesterday's hours
 - [x] Record hours on previous or future dates
+- [ ] Edit previously recorded hours before organization approval
 - [x] View your hours on a calendar
 - [x] Connect to an organization
 - [ ] Record hours without an organization
@@ -27,7 +28,6 @@ A simple way for small business employees to submit hours worked
 ### Easy to manage an organization
 - [ ] Optionally allow employees to see remaining hours of various types
 - [ ] Edit employee data including names, hours available, and hours recorded
-- [ ] Edit previously recorded hours while still unapproved
 - [ ] Approve pay periods and revoke approvals
 - [ ] Edit pay periods and adjust pay period schedule using several defaults, including bimonthly, biweekly, monthly, and weekly pay 
 - [ ] Adjust pay period due dates
