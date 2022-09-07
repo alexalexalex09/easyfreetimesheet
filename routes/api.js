@@ -771,4 +771,33 @@ router.post(
   })
 );
 
+router.post(
+  "/getOrgUser",
+  ash(async function (req, res, next) {
+    console.log("Removing");
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    const curUser = await User.findOne({ profile_id: req.user.id });
+    const curOrganization = await Organization.findOne({
+      code: req.body.orgCode,
+    });
+    const ownsOrg = curOrganization.owners.indexOf(curUser._id);
+    if (ownsOrg == -1) {
+      res.send({ err: "You are not an owner of this organization" });
+    }
+    const theUser = await User.findOne({ internalId: req.body.userCode });
+    const userInOrg = theUser.organizations.indexOf(curOrganization._id);
+    if (userInOrg == -1) {
+      res.send({ err: "This user is not in your organization" });
+    }
+    const returnObject = await User.findOne(
+      { _id: theUser._id },
+      { _id: 0, organizations: 0, profile_id: 0 }
+    );
+    res.send(returnObject);
+  })
+);
+
 module.exports = router;
