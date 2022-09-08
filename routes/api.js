@@ -458,7 +458,6 @@ router.post(
     const curHours = await Hours.find({
       user_profile_id: req.user.id,
     }).populate("organization", "name code");
-    consolue.log({ curHours });
     const curOrgs = curUser.organizations;
     res.send({
       hours: curHours,
@@ -636,6 +635,10 @@ router.post(
   })
 );
 
+/**
+ * @param start pay period start date
+ * @param org org code
+ */
 router.post(
   "/adminRevokePeriod",
   ash(async function (req, res, next) {
@@ -689,6 +692,11 @@ router.post(
   })
 );
 
+/**
+ * @param code organization code
+ * @param startDate
+ *
+ */
 router.post(
   "/getPayPeriodByOrg",
   ash(async function (req, res, next) {
@@ -738,6 +746,10 @@ router.post(
   })
 );
 
+/**
+ * @param userId user's internalId
+ * @param code organization code
+ */
 router.post(
   "/removeUserFromOrg",
   ash(async function (req, res, next) {
@@ -771,10 +783,13 @@ router.post(
   })
 );
 
+/**
+ * @param orgCode
+ * @param userCode
+ */
 router.post(
   "/getOrgUser",
   ash(async function (req, res, next) {
-    console.log("Removing");
     if (!req.user) {
       res.send(ERR_LOGIN);
       return;
@@ -792,11 +807,47 @@ router.post(
     if (userInOrg == -1) {
       res.send({ err: "This user is not in your organization" });
     }
-    const returnObject = await User.findOne(
+    const returnUser = await User.findOne(
       { _id: theUser._id },
       { _id: 0, organizations: 0, profile_id: 0 }
     );
-    res.send(returnObject);
+
+    const periods = await PayPeriod.find({
+      owner: curOrganization._id,
+    });
+    const unapprovedPeriods = await PayPeriod.find({
+      $and: [
+        { owner: curOrganization._id },
+        { _id: { $not: { $in: theUser.approvedPayPeriods } } },
+      ],
+    })
+      .populate("owner", "name code")
+      .exec();
+    const userApprovedPeriods = await PayPeriod.find({
+      $and: [
+        { owner: curOrganization._id },
+        { _id: { $in: theUser.approvedPayPeriods } },
+      ],
+    })
+      .populate("owner", "name code")
+      .exec();
+    const curHours = await Hours.find(
+      {
+        $and: [
+          { user_profile_id: theUser.profile_id },
+          { organization: curOrganization._id },
+        ],
+      },
+      { user: 0, user_profile_id: 0 }
+    ).populate("organization", "name code");
+
+    res.send({
+      user: returnUser,
+      hours: curHours,
+      periods: periods,
+      unapprovedPeriods: unapprovedPeriods,
+      userApprovedPeriods: userApprovedPeriods,
+    });
   })
 );
 

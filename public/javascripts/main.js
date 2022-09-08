@@ -145,3 +145,24 @@ function showSuccessCheck() {
   });
   return promise;
 }
+
+function periodSorter(type) {
+  return function (a, b) {
+    switch (type) {
+      case "unapproved":
+        return (
+          DateTime.fromISO(a.start, { zone: "utc" }) -
+          DateTime.fromISO(b.start, { zone: "utc" })
+        );
+        break;
+      case "revokable":
+      case "approved":
+      default:
+        return (
+          DateTime.fromISO(b.start, { zone: "utc" }) -
+          DateTime.fromISO(a.start, { zone: "utc" })
+        );
+        break;
+    }
+  };
+}

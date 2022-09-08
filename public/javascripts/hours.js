@@ -77,8 +77,6 @@ function getPeriodsHtml(periods, hours, orgs, type, action, hidden = false) {
   htmlString = ``;
   var hoursList = [];
   var periodList = [];
-  console.log({ orgs });
-  console.log(orgs.length);
   if (orgs.length > 1) {
     hoursList = hours.filter(function (v) {
       return v.organization.code == $("#periodsOrg").value;
@@ -90,24 +88,7 @@ function getPeriodsHtml(periods, hours, orgs, type, action, hidden = false) {
     hoursList = hours;
     periodList = periods;
   }
-  periodList.sort(function (a, b) {
-    switch (type) {
-      case "unapproved":
-        return (
-          DateTime.fromISO(a.start, { zone: "utc" }) -
-          DateTime.fromISO(b.start, { zone: "utc" })
-        );
-        break;
-      case "revokable":
-      case "approved":
-      default:
-        return (
-          DateTime.fromISO(b.start, { zone: "utc" }) -
-          DateTime.fromISO(a.start, { zone: "utc" })
-        );
-        break;
-    }
-  });
+  periodList.sort(periodSorter(type));
   htmlString += `
   <div class="${type}${hidden ? " hidden" : ""}">`;
   periodList.forEach(function (period) {
