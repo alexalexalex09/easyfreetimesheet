@@ -446,7 +446,7 @@ router.post(
       .exec();
     var revokablePeriods = [];
     var approvedPeriods = [];
-
+    console.log({ userApprovedPeriods });
     //For each period in the user's approved periods list
     userApprovedPeriods.forEach(function (period) {
       if (period.fullyApproved) {
@@ -565,7 +565,7 @@ router.post(
       v == req.body._id;
     });
     if (index == -1) {
-      curUser.approvedPayPeriods.push(curUser._id);
+      curUser.approvedPayPeriods.push(req.body._id);
       curUser.save().then(function (result) {
         res.send(result);
       });

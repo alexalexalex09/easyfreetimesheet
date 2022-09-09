@@ -26,9 +26,9 @@ A simple way for small business employees to submit hours worked
 - [ ] Download your pay periods
 
 ### Easy to manage an organization
-- [ ] Employees can see remaining hours of various types
+- [x] See employee details, pay periods, and remaining hours of various types
 - [ ] Edit employee data including names, hours available, and hours recorded
-- [ ] Approve pay periods and revoke approvals
+- [x] Approve pay periods and revoke approvals
 - [ ] Edit pay periods and adjust pay period schedule using several defaults, including bimonthly, biweekly, monthly, and weekly pay 
 - [ ] Adjust pay period due dates
 - [ ] Add and edit types of hours

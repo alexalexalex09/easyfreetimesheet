@@ -201,16 +201,3 @@ function revokePeriod(_id) {
     createPeriodsList(Periods);
   });
 }
-
-function viewPeriodDetail(_id) {
-  $("#period" + _id + " .displayHoursDetail").classList.remove("hidden");
-  $("#calendarShadow").classList.remove("hidden");
-  console.log("Nothing yet");
-}
-
-function closeModals() {
-  $$(".calendarModal").forEach(function (el) {
-    el.classList.add("hidden");
-  });
-  $("#calendarShadow").classList.add("hidden");
-}

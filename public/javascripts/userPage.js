@@ -21,13 +21,7 @@ window.addEventListener("load", function () {
   }).then(function (ret) {
     const user = ret.user;
     $("#userTitle").innerHTML = user.displayName;
-    var htmlString = `
-    <div id="yearlyHours">0/${user.hourLimits.maxYearly}</div>
-    <div id="vacationHours">0/${user.hourLimits.vacation}</div>
-    <div id="regularHours">${user.hourLimits.regularHours} hours per week</div>
-    `;
-    $("#hoursUsed").innerHTML = htmlString;
-    htmlString = ``;
+    var htmlString = ``;
     displayPayPeriod(
       ret.unapprovedPeriods,
       ret.hours,
@@ -40,6 +34,36 @@ window.addEventListener("load", function () {
       "approved",
       "#userApproved"
     );
+    const types = ["worked", "vacation"];
+    var totals = {};
+    types.forEach(function (type) {
+      var hoursTotal = 0;
+      var minutesTotal = 0;
+      var totalHoursList = [];
+      const currentYear = DateTime.now().year;
+      ret.hours.forEach(function (hours) {
+        const year = DateTime.fromISO(hours.date, {
+          zone: "utc",
+        }).year;
+        if (year == currentYear && hours.type == type) {
+          totalHoursList.push(hours);
+        }
+      });
+      totalHoursList.forEach(function (v) {
+        hoursTotal += Number.parseInt(v.hours);
+        minutesTotal += Number.parseInt(v.minutes);
+      });
+      hoursTotal += Math.floor(minutesTotal / 60);
+      minutesTotal = minutesTotal % 60;
+      totals[type] = hoursTotal + minutesTotal / 60;
+    });
+
+    htmlString = `
+    <div id="yearlyHours">Annual: ${totals.worked}/${user.hourLimits.maxYearly}</div>
+    <div id="vacationHours">Vacation: ${totals.vacation}/${user.hourLimits.vacation}</div>
+    <div id="regularHours">${user.hourLimits.regularHours} hours per week</div>
+    `;
+    $("#hoursUsed").innerHTML = htmlString;
   });
 });
 
@@ -64,8 +88,8 @@ function displayPayPeriod(periods, hours, type, element) {
       const dt = DateTime.fromISO(v.date, { zone: "utc" });
       return start <= dt && end >= dt;
     });
-    hoursTotal = 0;
-    minutesTotal = 0;
+    var hoursTotal = 0;
+    var minutesTotal = 0;
     periodHoursList.forEach(function (v) {
       hoursTotal += Number.parseInt(v.hours);
       minutesTotal += Number.parseInt(v.minutes);
@@ -77,7 +101,7 @@ function displayPayPeriod(periods, hours, type, element) {
       startDate.slice(0, -5) + " - " + endDate.slice(0, -4) + endDate.slice(-2);
     htmlString += `
         <div 
-          class="orgUserPeriodListElement"" 
+          class="orgUserPeriodListElement" 
           id="period${period._id}">
           <div class="displayPeriodDates">${date}</div>
           <div class="displayPeriodHours">${hoursTotal}:${minutesTotal}</div>`;

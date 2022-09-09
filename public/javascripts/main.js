@@ -146,6 +146,20 @@ function showSuccessCheck() {
   return promise;
 }
 
+function closeModals() {
+  $$(".calendarModal").forEach(function (el) {
+    el.classList.add("hidden");
+  });
+  $("#calendarShadow").classList.add("hidden");
+}
+
+function viewPeriodDetail(_id) {
+  console.log("#period" + _id + " .displayHoursDetail");
+  $("#period" + _id + " .displayHoursDetail").classList.remove("hidden");
+  $("#calendarShadow").classList.remove("hidden");
+  console.log("Nothing yet");
+}
+
 function periodSorter(type) {
   return function (a, b) {
     switch (type) {
