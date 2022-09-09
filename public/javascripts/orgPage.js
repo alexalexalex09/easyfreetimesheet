@@ -28,6 +28,7 @@ function closeModals() {
 
 function loadUsers(users) {
   htmlString = ``;
+  console.log({ users });
   users.forEach(function (user) {
     htmlString += `
       <div class="orgUser">

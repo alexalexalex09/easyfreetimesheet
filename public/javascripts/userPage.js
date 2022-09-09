@@ -22,6 +22,7 @@ window.addEventListener("load", function () {
     const user = ret.user;
     $("#userTitle").innerHTML = user.displayName;
     var htmlString = ``;
+    console.log(ret.unapprovedPeriods);
     displayPayPeriod(
       ret.unapprovedPeriods,
       ret.hours,
@@ -68,16 +69,19 @@ window.addEventListener("load", function () {
 });
 
 function displayPayPeriod(periods, hours, type, element) {
+  console.log(periods.length == 0);
   var htmlString = ``;
-  if (periods.length == 0 || hours.length == 0) {
-    return `<div class="orgUserPeriodListElement"></div>`;
+  if (periods.length == 0) {
+    $(element).innerHTML = `<div class="orgUserPeriodListElement"></div>`;
+    return;
   }
   var hoursList = [];
   var periodList = [];
   var hoursList = hours;
   var periodList = periods;
   periodList.sort(periodSorter(type));
-  periodList.forEach(function (period) {
+  periodList.forEach(function (period, i) {
+    console.log("Period " + i);
     const start = DateTime.fromISO(period.start, {
       zone: "utc",
     });
