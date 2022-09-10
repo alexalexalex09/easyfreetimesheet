@@ -851,4 +851,39 @@ router.post(
   })
 );
 
+/**
+ * @param user the user's code
+ * @param maxYearly
+ * @param regularHours
+ * @param vacation
+ */
+router.post(
+  "/editUserHours",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    const theOrg = await Organization.findOne({ owner: req.user._id });
+    var theUser = await User.findOne({ internal_id: req.body.user }).exec();
+    if (theUser.organizations.indexOf(theOrg._id) == -1) {
+      res.send({ err: "User is not in your organization" });
+    }
+    console.log({ theUser });
+    console.log(theUser.internalId);
+    console.log(theUser.hourLimits);
+    console.log(Object.keys(theUser));
+    theUser.hourLimits.maxYearly = req.body.maxYearly;
+    theUser.hourLimits.regularHours = req.body.regularHours;
+    theUser.hourLimits.vacation = req.body.vacation;
+    theUser.save().then(function (user) {
+      res.send({
+        maxYearly: user.hourLimits.maxYearly,
+        regularHours: user.hourLimits.regularHours,
+        vacation: user.hourLimits.vacation,
+      });
+    });
+  })
+);
+
 module.exports = router;

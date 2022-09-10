@@ -864,6 +864,11 @@ div#login {
   margin-bottom: 10px;
 }
 
+#hoursUsedTitle i {
+  font-size: 0.7em;
+  transform: translate(10px, -10px);
+  cursor: pointer;
+}
 
 
 

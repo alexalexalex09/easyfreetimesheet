@@ -65,6 +65,21 @@ window.addEventListener("load", function () {
     <div id="regularHours">${user.hourLimits.regularHours} hours per week</div>
     `;
     $("#hoursUsed").innerHTML = htmlString;
+    var el = document.createElement("div");
+    el.classList.add("calendarModal");
+    el.classList.add("hidden");
+    el.id = "editHoursModal";
+    el.innerHTML = `
+      <label for="editYearly">Annual</label>
+      <input type="number" x-data-original="${user.hourLimits.maxYearly}" value="${user.hourLimits.maxYearly}" name="editYearly" id="editYearly"></input>
+      <label for="editVacation">Vacation</label>
+      <input type="number" x-data-original="${user.hourLimits.vacation}" value="${user.hourLimits.vacation}" name="editVacation" id="editVacation"></input>
+      <label for="editRegular">Weekly</label>
+      <input type="number" x-data-original="${user.hourLimits.regularHours}" value="${user.hourLimits.regularHours}" name="editRegular" id="editRegular"></input>
+      <button onclick="resetEditHours()">Cancel</button>
+      <button onclick="submitHoursChanges()">Submit</button>
+    `;
+    $("body").appendChild(el);
   });
 });
 
@@ -81,7 +96,6 @@ function displayPayPeriod(periods, hours, type, element) {
   var periodList = periods;
   periodList.sort(periodSorter(type));
   periodList.forEach(function (period, i) {
-    console.log("Period " + i);
     const start = DateTime.fromISO(period.start, {
       zone: "utc",
     });
@@ -152,4 +166,37 @@ function displayPayPeriod(periods, hours, type, element) {
           `;
   });
   $(element).innerHTML = htmlString;
+}
+
+function editHours() {
+  $("#calendarShadow").classList.remove("hidden");
+  $("#editHoursModal").classList.remove("hidden");
+}
+
+function resetEditHours() {
+  $("#editYearly").value = $("#editYearly").getAttribute("x-data-original");
+  $("#editVacation").value = $("#editVacation").getAttribute("x-data-original");
+  $("#editRegular").value = $("#editRegular").getAttribute("x-data-original");
+  closeModals();
+}
+
+function submitHoursChanges() {
+  eftFetch("/api/editUserHours", {
+    user: window.location.href.substring(
+      window.location.href.lastIndexOf("/") + 1
+    ),
+    maxYearly: $("#editYearly").value,
+    vacation: $("#editVacation").value,
+    regularHours: $("#editRegular").value,
+  }).then(function (ret) {
+    window.location.reload();
+    /*
+    $("#editYearly").value = ret.maxYearly;
+    $("#editYearly").setAttribute("x-data-original", ret.maxYearly);
+    $("#editVacation").value = ret.vacation;
+    $("#editVacation").setAttribute("x-data-original", ret.vacation);
+    $("#editRegular").value = ret.regularHours;
+    $("#editRegular").setAttribute("x-data-original", ret.regularHours);
+    closeModals();*/
+  });
 }
