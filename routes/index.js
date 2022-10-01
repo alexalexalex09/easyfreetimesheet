@@ -35,6 +35,13 @@ router.get("/myOrgs/:orgCode/user/:userCode", (req, res) => {
   });
 });
 
+router.get("/myOrgs/:orgCode/payPeriods", (req, res) => {
+  var orgCode = req.params.orgCode.toUpperCase();
+  res.render("payPeriods", {
+    orgCode: orgCode,
+  });
+});
+
 router.get("/hours", function (req, res, next) {
   res.render("hours", { title: "Timecard.live" });
 });

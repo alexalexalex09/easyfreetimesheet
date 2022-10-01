@@ -150,6 +150,9 @@ function closeModals() {
   $$(".calendarModal").forEach(function (el) {
     el.classList.add("hidden");
   });
+  $$(".inputModal").forEach(function (el) {
+    el.classList.add("hidden");
+  });
   $("#calendarShadow").classList.add("hidden");
 }
 

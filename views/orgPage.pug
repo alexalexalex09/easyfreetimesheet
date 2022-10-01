@@ -6,10 +6,11 @@ block scripts
 block content
   #orgContainer.mainContainer
     #orgTitle.pageTitle
-    #toApproveTitle.orgPageTitle Periods to Approve
-    #toApproveList.orgPageList
     #orgUsersTitle.orgPageTitle Users
     #orgUsersList.orgPageList 
+    a#adjustPayPeriods(href=`/myOrgs/${orgCode}/payPeriods`) Adjust Pay Periods
+    #toApproveTitle.orgPageTitle Periods to Approve
+    #toApproveList.orgPageList
     #approvedTitle.orgPageTitle Approved Pay Periods
     #approvedList.orgPageList
     #upcomingTitle.orgPageTitle Upcoming Pay Periods 

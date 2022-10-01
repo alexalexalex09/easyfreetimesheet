@@ -8,10 +8,15 @@ if (typeof $$ == "undefined") {
 const userCode = window.location.pathname
   .slice(window.location.pathname.lastIndexOf("/") + 1)
   .toUpperCase();
+
 const orgCode = window.location.pathname.slice(
   window.location.pathname.indexOf("myOrgs") + 7,
   window.location.pathname.indexOf("myOrgs") + 12
 );
+
+function goToOrg() {
+  window.location = "/myOrgs/" + orgCode;
+}
 
 window.addEventListener("load", function () {
   DateTime = luxon.DateTime;
@@ -74,6 +79,7 @@ window.addEventListener("load", function () {
     $("#hoursUsed").innerHTML = htmlString;
     var el = document.createElement("div");
     el.classList.add("calendarModal");
+    el.classList.add("inputModal");
     el.classList.add("hidden");
     el.id = "editHoursModal";
     el.innerHTML = `
@@ -231,6 +237,7 @@ function submitHoursChanges() {
 function editName() {
   var el = document.createElement("div");
   el.classList.add("calendarModal");
+  el.classList.add("inputModal");
   el.id = "editUserModal";
   el.innerHTML = `
       <label for="editUserName">New Name</label>
