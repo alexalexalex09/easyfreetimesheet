@@ -5,7 +5,9 @@ block scripts
 
 block content
   #userContainer.mainContainer
-    #userTitle.pageTitle User Name
+    #userName
+      #userTitle.pageTitle User Name
+      i.fa-solid.fa-pen-to-square(onclick="editName()")
     #hoursUsedTitle.userPageTitle Hours
       i.fa-solid.fa-pen-to-square(onclick="editHours()")
     #hoursUsed

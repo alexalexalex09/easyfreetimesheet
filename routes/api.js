@@ -200,7 +200,7 @@ router.post(
     const curUser = await User.findOne({ profile_id: req.user.id }).exec();
     const orgs = await Organization.find(
       {
-        owner: curUser._id,
+        owners: curUser._id,
       },
       "name code"
     ).exec();
@@ -856,6 +856,7 @@ router.post(
  * @param maxYearly
  * @param regularHours
  * @param vacation
+ * @param period
  */
 router.post(
   "/editUserHours",
@@ -873,6 +874,9 @@ router.post(
     console.log(theUser.internalId);
     console.log(theUser.hourLimits);
     console.log(Object.keys(theUser));
+    if (["day", "week", "month", "year"].indexOf(req.body.period != -1)) {
+      theUser.hourLimits.period = req.body.period;
+    }
     theUser.hourLimits.maxYearly = req.body.maxYearly;
     theUser.hourLimits.regularHours = req.body.regularHours;
     theUser.hourLimits.vacation = req.body.vacation;
@@ -881,8 +885,31 @@ router.post(
         maxYearly: user.hourLimits.maxYearly,
         regularHours: user.hourLimits.regularHours,
         vacation: user.hourLimits.vacation,
+        period: user.hourLimits.period,
       });
     });
+  })
+);
+
+/**
+ * @param username
+ */
+router.post(
+  "/editUserName",
+  [body("username").not().isEmpty().trim().escape().stripLow()],
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    const theOrg = await Organization.findOne({ owner: req.user._id });
+    var theUser = await User.findOne({ internal_id: req.body.user }).exec();
+    if (theUser.organizations.indexOf(theOrg._id) == -1) {
+      res.send({ err: "User is not in your organization" });
+    }
+    theUser.displayName = req.body.username;
+    theUser.save();
+    res.send({ username: req.body.username });
   })
 );
 

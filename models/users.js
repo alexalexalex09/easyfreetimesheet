@@ -11,7 +11,12 @@ var UserSchema = new Schema(
     profile_id: String,
     internalId: String,
     darkMode: Boolean,
-    hourLimits: { maxYearly: Number, regularHours: Number, vacation: Number },
+    hourLimits: {
+      maxYearly: Number,
+      regularHours: Number,
+      vacation: Number,
+      period: String,
+    },
     organizations: [{ type: Schema.Types.ObjectId, ref: "Organization" }],
     approvedPayPeriods: [{ type: Schema.Types.ObjectId, ref: "PayPeriod" }],
   },

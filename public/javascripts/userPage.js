@@ -58,12 +58,19 @@ window.addEventListener("load", function () {
       minutesTotal = minutesTotal % 60;
       totals[type] = hoursTotal + minutesTotal / 60;
     });
-
+    console.log({ user });
     htmlString = `
-    <div id="yearlyHours">Annual: ${totals.worked}/${user.hourLimits.maxYearly}</div>
-    <div id="vacationHours">Vacation: ${totals.vacation}/${user.hourLimits.vacation}</div>
-    <div id="regularHours">${user.hourLimits.regularHours} hours per week</div>
+    <div id="yearlyHours" x-data-total="${totals.worked}">Annual: ${totals.worked}/${user.hourLimits.maxYearly}</div>
+    <div id="vacationHours" x-data-total="${totals.vacation}">Vacation: ${totals.vacation}/${user.hourLimits.vacation}</div>
+    <div id="regularHours">${user.hourLimits.regularHours} hours per ${user.hourLimits.period}</div>
     `;
+    let selectedPeriod = {
+      week: "",
+      month: "",
+      quarter: "",
+      year: "",
+    };
+    selectedPeriod[user.hourLimits.period] = "selected";
     $("#hoursUsed").innerHTML = htmlString;
     var el = document.createElement("div");
     el.classList.add("calendarModal");
@@ -74,8 +81,15 @@ window.addEventListener("load", function () {
       <input type="number" x-data-original="${user.hourLimits.maxYearly}" value="${user.hourLimits.maxYearly}" name="editYearly" id="editYearly"></input>
       <label for="editVacation">Vacation</label>
       <input type="number" x-data-original="${user.hourLimits.vacation}" value="${user.hourLimits.vacation}" name="editVacation" id="editVacation"></input>
-      <label for="editRegular">Weekly</label>
+      <label for="editRegular">Per Period</label>
       <input type="number" x-data-original="${user.hourLimits.regularHours}" value="${user.hourLimits.regularHours}" name="editRegular" id="editRegular"></input>
+      <label for="editPeriod">Period Type</label>
+      <select name="editPeriod" x-data-original="${user.hourLimits.period}" id="editPeriod">
+        <option value="week" ${selectedPeriod.week}>Weekly</option>
+        <option value="month" ${selectedPeriod.month}>Monthly</option>
+        <option value="quarter" ${selectedPeriod.quarter}>Quarterly</option>
+        <option value="year" ${selectedPeriod.year}>Yearly</option>
+      </select>
       <button onclick="resetEditHours()">Cancel</button>
       <button onclick="submitHoursChanges()">Submit</button>
     `;
@@ -177,6 +191,7 @@ function resetEditHours() {
   $("#editYearly").value = $("#editYearly").getAttribute("x-data-original");
   $("#editVacation").value = $("#editVacation").getAttribute("x-data-original");
   $("#editRegular").value = $("#editRegular").getAttribute("x-data-original");
+  $("#editPeriod").value = $("#editPeriod").getAttribute("x-data-original");
   closeModals();
 }
 
@@ -188,15 +203,51 @@ function submitHoursChanges() {
     maxYearly: $("#editYearly").value,
     vacation: $("#editVacation").value,
     regularHours: $("#editRegular").value,
+    period: $("#editPeriod").value,
   }).then(function (ret) {
-    window.location.reload();
-    /*
+    console.log({ ret });
+    //window.location.reload();
+
     $("#editYearly").value = ret.maxYearly;
     $("#editYearly").setAttribute("x-data-original", ret.maxYearly);
     $("#editVacation").value = ret.vacation;
     $("#editVacation").setAttribute("x-data-original", ret.vacation);
     $("#editRegular").value = ret.regularHours;
     $("#editRegular").setAttribute("x-data-original", ret.regularHours);
-    closeModals();*/
+    var newTotals = {
+      worked: $("#yearlyHours").getAttribute("x-data-total"),
+      vacation: $("#vacationHours").getAttribute("x-data-total"),
+    };
+    htmlString = `
+    <div id="yearlyHours" x-data-total="${newTotals.worked}">Annual: ${newTotals.worked}/${ret.maxYearly}</div>
+    <div id="vacationHours" x-data-total="${newTotals.vacation}">Vacation: ${newTotals.vacation}/${ret.vacation}</div>
+    <div id="regularHours">${ret.regularHours} hours per ${ret.period}</div>
+    `;
+    $("#hoursUsed").innerHTML = htmlString;
+    closeModals();
   });
+}
+
+function editName() {
+  var el = document.createElement("div");
+  el.classList.add("calendarModal");
+  el.id = "editUserModal";
+  el.innerHTML = `
+      <label for="editUserName">New Name</label>
+      <input type="text" id="editUserName" value="${
+        $("#userTitle").innerHTML
+      }"</input>
+      <button onclick="closeModals()">Cancel</button>
+      <button onclick="submitNewUsername()">Submit</button>`;
+  $("#calendarShadow").classList.remove("hidden");
+  $("body").appendChild(el);
+}
+
+function submitNewUsername() {
+  eftFetch("/api/editUserName", { username: $("#editUserName").value }).then(
+    function (ret) {
+      $("#userTitle").innerHTML = ret.username;
+      closeModals();
+    }
+  );
 }

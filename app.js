@@ -84,6 +84,7 @@ passport.use(
             maxYearly: 40 * 48,
             regularHours: 40,
             vacation: 40 * 4,
+            period: "week",
           };
         }
         curUser.save().then(function (curUser) {
