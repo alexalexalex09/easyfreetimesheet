@@ -902,7 +902,7 @@ router.post(
       res.send(ERR_LOGIN);
       return;
     }
-    const theOrg = await Organization.findOne({ owner: req.user._id });
+    const theOrg = await Organization.findOne({ owner: req.user._id }).exec();
     var theUser = await User.findOne({ internal_id: req.body.user }).exec();
     if (theUser.organizations.indexOf(theOrg._id) == -1) {
       res.send({ err: "User is not in your organization" });
@@ -912,5 +912,74 @@ router.post(
     res.send({ username: req.body.username });
   })
 );
+
+/**
+ * @param periods
+ */
+router.post(
+  "/addPeriods",
+  ash(async function (req, res, next) {
+    if (!req.user) {
+      res.send(ERR_LOGIN);
+      return;
+    }
+    const periods = Number(req.body.periods);
+    if (periods == "NaN") {
+      res.send({
+        err: "Number of periods not specified correctly: " + typeof periods,
+      });
+    }
+    if (periods < 1) {
+      res.send({ err: "Number of periods to add must be greater than 0" });
+    }
+    const theOrg = await Organization.findOne({ owner: req.user._id }).exec();
+    const payPeriods = await PayPeriod.find({ owner: theOrg._id }).exec();
+    const payPeriodsSorted = [...payPeriods].sort(function (a, b) {
+      return (
+        DateTime.fromJSDate(b.start, { zone: "utc" }) -
+        DateTime.fromJSDate(a.start, { zone: "utc" })
+      );
+    });
+    const finalPayPeriod = payPeriodsSorted[0];
+    var start = DateTime.fromJSDate(finalPayPeriod.end);
+    for (var i = 0; i < periods; i++) {
+      start = await addPayPeriod(theOrg, start.plus({ day: 1 }));
+      console.log({ start });
+    }
+    res.send({ success: `Added ${i} pay periods` });
+  })
+);
+
+async function addPayPeriod(owner, start) {
+  console.log("Day:" + start.day);
+  var end = start.set({ day: 1 });
+  if (start.day == 16) {
+    end = start.plus({ month: 1 });
+    end = end.set({ day: 1 });
+    end = end.minus({ day: 1 });
+  } else {
+    end = start.set({ day: 15 });
+  }
+  var due = end.plus({ days: 7 });
+  startDate = new Date(start.toISO());
+  endDate = new Date(end.toISO());
+  dueDate = new Date(due.toISO());
+  console.log({
+    start: startDate,
+    end: endDate,
+    dueDate: dueDate,
+    approvedBy: [],
+    fullyApproved: false,
+  });
+  await PayPeriod.create({
+    owner: owner,
+    start: startDate,
+    end: endDate,
+    dueDate: dueDate,
+    approvedBy: [],
+    fullyApproved: false,
+  });
+  return end;
+}
 
 module.exports = router;

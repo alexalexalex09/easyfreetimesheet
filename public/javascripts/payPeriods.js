@@ -22,3 +22,15 @@ function showModal(modal) {
   $("#calendarShadow").classList.remove("hidden");
   $("#" + modal).classList.remove("hidden");
 }
+
+function submitPeriodsToAdd() {
+  var periods = $("#periodsToAdd").value;
+  eftFetch("/api/addPeriods", { periods: periods }).then(function (ret) {
+    console.log({ ret });
+    closeModals();
+  });
+}
+
+function submitSchedule() {}
+
+function submitDueDate() {}
