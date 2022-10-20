@@ -16,6 +16,11 @@ function goToOrg() {
 
 window.addEventListener("load", function () {
   DateTime = luxon.DateTime;
+  eftFetch("/api/getOrg", { code: orgCode }).then(function (ret) {
+    const { org, upcoming } = ret;
+    $("#payPeriodsOrg").innerHTML = org.name;
+    fillPeriods(upcoming, "#payPeriodsListContainer");
+  });
 });
 
 function showModal(modal) {
@@ -29,6 +34,24 @@ function submitPeriodsToAdd() {
     console.log({ ret });
     closeModals();
   });
+}
+
+function fillPeriods(periods, el) {
+  var htmlString = "";
+  periods.forEach(function (period) {
+    const start = DateTime.fromISO(period.start, {
+      zone: "utc",
+    });
+    const startDate = start.toLocaleString();
+    const end = DateTime.fromISO(period.end, { zone: "utc" });
+    const endDate = end.toLocaleString();
+    const date =
+      startDate.slice(0, -5) + " - " + endDate.slice(0, -4) + endDate.slice(-2);
+    htmlString += `<div class="orgPeriodDate"><a href="/myOrgs/${orgCode}/payPeriod/${start
+      .toString()
+      .slice(0, 10)}">${date}</a></div>`;
+  });
+  $(el).innerHTML = htmlString;
 }
 
 function submitSchedule() {}

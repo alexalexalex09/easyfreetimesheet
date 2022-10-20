@@ -47,7 +47,10 @@ function loadUsers(users) {
   });
   $("#orgUsersList").innerHTML = htmlString;
 }
-
+/**
+ *
+ * @param {approvedPeriods, toApprove, upcoming} org Pay periods of various types for the org
+ */
 function loadPayPeriods(org) {
   htmlString = ``;
   const { approvedPeriods, toApprove, upcoming } = org;
@@ -59,25 +62,6 @@ function loadPayPeriods(org) {
 function editUser(el) {
   $("#calendarShadow").classList.remove("hidden");
   el.parentElement.querySelector(".editUserModal").classList.remove("hidden");
-}
-
-function fillPeriods(periods, el) {
-  var htmlString = "";
-  periods.forEach(function (period) {
-    const start = DateTime.fromISO(period.start, {
-      zone: "utc",
-    });
-    const startDate = start.toLocaleString();
-    const end = DateTime.fromISO(period.end, { zone: "utc" });
-    const endDate = end.toLocaleString();
-    const date =
-      startDate.slice(0, -5) + " - " + endDate.slice(0, -4) + endDate.slice(-2);
-    htmlString += `<div class="orgPeriodDate"><a href="/myOrgs/${orgCode}/payperiod/${start
-      .toString()
-      .slice(0, 10)}">${date}</a></div>`;
-  });
-
-  $(el).innerHTML = htmlString;
 }
 
 function removeUser(userId) {

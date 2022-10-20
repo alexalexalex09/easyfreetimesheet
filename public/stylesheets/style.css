@@ -922,3 +922,40 @@ div#login {
 #addPeriodsModal input, #adjustScheduleModal select, #changeDueDateModal input {
   grid-area: 2/1/3/3;
 }
+
+.pageTitle#payPeriodsOrg {
+  grid-area: 2/1/3/11;
+}
+
+#adjustSchedule {
+  grid-area: 3/1/4/11;
+}
+
+#adjustPeriodsContainer>button {
+  max-width: 20rem;
+  font-size: 1rem;
+}
+
+#adjustPeriodsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.adjustEndDate {
+  background-color: unset;
+  box-shadow: none;
+  color: unset;
+  font-size: unset;
+  opacity: 1;
+  padding: unset;
+  text-decoration: underline dashed;
+}
+
+.adjustStartDate {
+  display: inline;
+}
+
+.radioOption {
+  font-size: 1rem;
+}

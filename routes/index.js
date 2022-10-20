@@ -17,7 +17,7 @@ router.get("/myOrgs/:orgCode", (req, res) => {
   });
 });
 
-router.get("/myOrgs/:orgCode/payperiod/:startDate", (req, res) => {
+router.get("/myOrgs/:orgCode/payPeriod/:startDate", (req, res) => {
   var orgCode = req.params.orgCode.toUpperCase();
   var startDate = req.params.startDate + "T00:00:00.000Z";
   res.render("payPeriodPage", {
@@ -32,6 +32,13 @@ router.get("/myOrgs/:orgCode/user/:userCode", (req, res) => {
   res.render("userPage", {
     orgCode: orgCode,
     userCode: userCode,
+  });
+});
+
+router.get("/myOrgs/:orgCode/payPeriods/adjust", (req, res) => {
+  var orgCode = req.params.orgCode.toUpperCase();
+  res.render("payPeriodsAdjust", {
+    orgCode: orgCode,
   });
 });
 

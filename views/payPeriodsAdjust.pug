@@ -1,0 +1,23 @@
+extends layout
+
+block scripts 
+  script(type="text/javascript" src="/javascripts/payPeriodsAdjust.js")
+
+block content
+  #adjustPeriodsContainer.mainContainer
+    #payPeriodsTitle.pageTitle Adjust Pay Periods
+    #payPeriodsOrg.pageTitle
+    button#adjustSchedule(onclick="window.location='./adjustBulk'") Switch to Bulk Adjust
+    .radioOption 
+      label(for='preserveDates') Preserve subsequent end dates
+      input(type='radio' name='adjustType' id='preserveDates' checked)
+    .radioOption
+      label(for='preserveLengths') Preserve subsequent pay period lengths
+      input(type='radio' name='adjustType' id='preserveLengths')
+    #adjustPeriodsListContainer
+  #calendarShadow.hidden(onclick="closeModals()")
+  #footer
+    i#menuButton.fa-solid.fa-bars(onclick="toggleMenu()")
+    i#OrgButton.fa-solid.fa-calendar(onclick="window.location='../payPeriods'")
+    i#homeButton.fa-solid.fa-house(onclick="window.location='/'")
+  include menu

@@ -100,6 +100,9 @@ router.post(
   })
 );
 
+/**
+ * @param code an organization's code
+ */
 router.post(
   "/getOrg",
   ash(async function (req, res, next) {

@@ -8,26 +8,15 @@ block content
     #payPeriodsTitle.pageTitle Pay Periods
     #payPeriodsOrg.pageTitle
     button#addPeriods(onclick="showModal('addPeriodsModal')") Add Pay Periods
-    button#adjustSchedule(onclick="showModal('adjustScheduleModal')") Adjust Schedule 
+    button#adjustSchedule(onclick="window.location.href='./payPeriods/adjust'") Adjust Schedule 
     button#changeDueDate(onclick="showModal('changeDueDateModal')") Change Due Dates 
-    #payPeriodsContainer
+    #payPeriodsListContainer
   #calendarShadow.hidden(onclick="closeModals()")
   #addPeriodsModal.inputModal.hidden
     label(for="periodsToAdd") Number of periods to add:
     input#periodsToAdd(type="number")
     button.cancel(onclick="closeModals()") Cancel
     button#submitPeriodsToAdd(onclick="submitPeriodsToAdd()") Submit
-  #adjustScheduleModal.inputModal.hidden 
-    label(for="scheduleTypes") Schedule type: 
-    select#scheduleTypes(name="scheduleTypes") 
-      option Weekly 
-      option Biweekly 
-      option Bimontly 
-      option Monthly 
-      option Quarterly 
-      option Yearly
-    button.cancel(onclick="closeModals()") Cancel
-    button#submitSchedule(onclick="submitSchedule()") Submit
   #changeDueDateModal.inputModal.hidden 
     label(for="daysAfter") How many days after the periods ends are timesheets due? Enter 0 for timesheets that are due on the last day of a pay period 
     input#daysAfter(type="number")
